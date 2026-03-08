@@ -1,0 +1,65 @@
+{
+  "case_id": "met3_min_spacing_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: m3.3cd\nDescription: m3.3cd : min. 3um.m3 spacing m3 : 0.4um\nRunset expression: ( huge_m3.separation(non_huge_m3, 0.4, euclidian) + huge_m3.space(0.4, euclidian) )\nExpression refs: huge_m3, non_huge_m3\nUpstream chain: L156:m3_wildcard = \"70/20\" | L201:m3 = polygons(m3_wildcard) | L1255:huge_m3 = m3.sized(-1.5).sized(1.5).snap(0.005) & m3 | L1256:non_huge_m3 = m3.edges - huge_m3 | L1257:huge_m3 = huge_m3.edges.outside_part(m3.merged)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met3",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          3200,
+          0
+        ],
+        [
+          3200,
+          4000
+        ],
+        [
+          0,
+          4000
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "met3",
+      "points": [
+        [
+          3540,
+          0
+        ],
+        [
+          3620,
+          40
+        ],
+        [
+          3840,
+          40
+        ],
+        [
+          3840,
+          4000
+        ],
+        [
+          3540,
+          4000
+        ],
+        [
+          3540,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

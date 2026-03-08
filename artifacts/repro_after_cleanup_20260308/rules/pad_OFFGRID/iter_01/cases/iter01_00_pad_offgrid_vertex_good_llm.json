@@ -1,0 +1,34 @@
+{
+  "case_id": "pad_offgrid_vertex_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: pad_OFFGRID\nDescription: x.1b : OFFGRID vertex on pad\nRunset expression: pad.ongrid(0.005)\nExpression refs: pad\nUpstream chain: L209:pad = polygons(76, 20)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "pad",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

@@ -1,0 +1,36 @@
+{
+  "case_id": "nwell_min_width_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: nwell.1\nDescription: nwell.1 : min. nwell width : 0.84um\nRunset expression: log(\"START: 64/20 (nwell)\") nwell.width(0.84, euclidian)\nExpression refs: nwell\nUpstream chain: L167:nwell_wildcard = \"64/20\" | L171:nwell = polygons(nwell_wildcard)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "nwell",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          960,
+          20
+        ],
+        [
+          960,
+          80
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

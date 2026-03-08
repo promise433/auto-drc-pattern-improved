@@ -1,0 +1,32 @@
+{
+  "case_id": "pad_forbidden_angle_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: pad_angle\nDescription: x.3a : non 45 degree angle pad\nRunset expression: pad.with_angle(0..45)\nExpression refs: pad\nUpstream chain: L209:pad = polygons(76, 20)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "pad",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          220,
+          160
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: polygon is not closed"
+  ]
+}

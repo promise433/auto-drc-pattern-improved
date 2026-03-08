@@ -1,0 +1,86 @@
+{
+  "case_id": "met2_must_interact_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: m2.x\nDescription: floating met2, must interact with via1 or via2\nRunset expression: m2.not_interacting(via.or(via2))\nExpression refs: m2, via, via2\nUpstream chain: L151:via_wildcard = \"68/44\" | L153:m2_wildcard = \"69/20\" | L154:via2_wildcard = \"69/44\" | L196:via = polygons(via_wildcard) | L198:m2 = polygons(m2_wildcard) | L199:via2 = polygons(via2_wildcard)\nRunset context: if BEOL | if FLOATING_MET [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met2",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          200,
+          0
+        ],
+        [
+          200,
+          200
+        ],
+        [
+          0,
+          200
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "via2",
+      "points": [
+        [
+          260,
+          0
+        ],
+        [
+          290,
+          20
+        ],
+        [
+          290,
+          200
+        ],
+        [
+          260,
+          200
+        ],
+        [
+          260,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "via",
+      "points": [
+        [
+          520,
+          0
+        ],
+        [
+          720,
+          0
+        ],
+        [
+          720,
+          200
+        ],
+        [
+          520,
+          200
+        ],
+        [
+          520,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

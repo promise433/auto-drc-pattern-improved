@@ -1,0 +1,36 @@
+{
+  "case_id": "li_offgrid_vertex_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: li_OFFGRID\nDescription: x.1b : OFFGRID vertex on li\nRunset expression: li.ongrid(0.005)\nExpression refs: li\nUpstream chain: L146:li_wildcard = \"67/20\" | L191:li = polygons(li_wildcard)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "li",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          201,
+          21
+        ],
+        [
+          201,
+          201
+        ],
+        [
+          1,
+          201
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

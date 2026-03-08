@@ -1,0 +1,34 @@
+{
+  "case_id": "hvtr_forbidden_angle_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: hvtr_angle\nDescription: x.3a : non 45 degree angle hvtr\nRunset expression: hvtr.with_angle(0..45)\nExpression refs: hvtr\nUpstream chain: L176:hvtr = polygons(18, 20)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "hvtr",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

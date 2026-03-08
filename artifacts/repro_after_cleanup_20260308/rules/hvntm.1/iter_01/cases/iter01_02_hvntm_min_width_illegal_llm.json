@@ -1,0 +1,36 @@
+{
+  "case_id": "hvntm_min_width_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: hvntm.1\nDescription: hvntm.1 : min. hvntm width : 0.7um\nRunset expression: hvntm_peri.width(0.7, euclidian)\nExpression refs: hvntm_peri\nUpstream chain: L183:hvntm = polygons(125, 20) | L225:areaid_ce = polygons(81, 2) | L1483:hvntm_peri = hvntm.not(areaid_ce)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "hvntm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          820,
+          20
+        ],
+        [
+          820,
+          80
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

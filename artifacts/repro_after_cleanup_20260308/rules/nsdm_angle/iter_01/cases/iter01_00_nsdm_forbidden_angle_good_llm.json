@@ -1,0 +1,34 @@
+{
+  "case_id": "nsdm_forbidden_angle_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: nsdm_angle\nDescription: x.3a : non 45 degree angle nsdm\nRunset expression: nsdm.with_angle(0..45)\nExpression refs: nsdm\nUpstream chain: L164:nsdm_wildcard = \"93/44\" | L184:nsdm = polygons(nsdm_wildcard)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "nsdm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

@@ -1,0 +1,59 @@
+{
+  "case_id": "cap2m_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: cap2m.5\nDescription: cap2m.5 : min. cap2m spacing to via4 : 0.2um\nRunset expression: cap2m.separation(via4, 0.2, euclidian)\nExpression refs: cap2m, via4\nUpstream chain: L160:via4_wildcard = \"71/44\" | L205:via4 = polygons(via4_wildcard) | L212:cap2m = polygons(97, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "cap2m",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1000,
+          0
+        ],
+        [
+          1000,
+          2000
+        ],
+        [
+          0,
+          2000
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "via4",
+      "points": [
+        [
+          1260,
+          0
+        ],
+        [
+          2060,
+          0
+        ],
+        [
+          2060,
+          1600
+        ],
+        [
+          1260,
+          1600
+        ],
+        [
+          1260,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

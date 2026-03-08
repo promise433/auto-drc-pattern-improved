@@ -1,0 +1,84 @@
+{
+  "case_id": "nsdm_min_spacing_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: nsdm.6a\nDescription: nsdm.6a : min. nsdm spacing on parallel edges in areaid:ce : 0.38um\nRunset expression: nsdm .inside(areaid_ce) .space(0.38, projection) .with_internal_angle(0)\nExpression refs: nsdm, areaid_ce\nUpstream chain: L164:nsdm_wildcard = \"93/44\" | L184:nsdm = polygons(nsdm_wildcard) | L225:areaid_ce = polygons(81, 2)\nRunset context: if FEOL | else [cand=1] [repaired] [ctx-markers]",
+  "lpl": [
+    {
+      "layer": "nsdm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          380,
+          0
+        ],
+        [
+          380,
+          760
+        ],
+        [
+          0,
+          760
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "nsdm",
+      "points": [
+        [
+          700,
+          0
+        ],
+        [
+          1080,
+          0
+        ],
+        [
+          1080,
+          760
+        ],
+        [
+          700,
+          760
+        ],
+        [
+          700,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "areaid_ce",
+      "points": [
+        [
+          -80,
+          -80
+        ],
+        [
+          1160,
+          -80
+        ],
+        [
+          1160,
+          840
+        ],
+        [
+          -80,
+          840
+        ],
+        [
+          -80,
+          -80
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

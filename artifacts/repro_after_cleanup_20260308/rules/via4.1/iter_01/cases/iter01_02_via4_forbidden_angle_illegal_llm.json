@@ -1,0 +1,32 @@
+{
+  "case_id": "via4_forbidden_angle_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: via4.1\nDescription: via4.1 : via4 outside of moduleCut should be rectangular\nRunset expression: via4_not_mt.non_rectangles\nExpression refs: via4_not_mt\nUpstream chain: L160:via4_wildcard = \"71/44\" | L205:via4 = polygons(via4_wildcard) | L231:areaid_mt = polygons(81, 10) | L1381:rectvia4 = via4 | L1384:via4_not_mt = rectVIA4.not(areaid_mt)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via4",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          220,
+          160
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: polygon is not closed"
+  ]
+}

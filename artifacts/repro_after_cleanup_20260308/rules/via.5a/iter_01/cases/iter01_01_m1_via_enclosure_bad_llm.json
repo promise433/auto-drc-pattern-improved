@@ -1,0 +1,59 @@
+{
+  "case_id": "m1_via_enclosure_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: via.5a\nDescription: via.5a : min. m1 enclosure of 0.15um via of 2 adjacent edges : 0.085um\nRunset expression: via2_interact\nExpression refs: via2_interact\nUpstream chain: L151:via_wildcard = \"68/44\" | L196:via = polygons(via_wildcard) | L1126:via2_interact = via.interacting(error_corners_via1.polygons(1.dbu))\nRunset context: if BEOL | if backend_flow = AL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          450,
+          300
+        ],
+        [
+          450,
+          450
+        ],
+        [
+          300,
+          450
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "m1",
+      "points": [
+        [
+          275,
+          275
+        ],
+        [
+          595,
+          275
+        ],
+        [
+          595,
+          595
+        ],
+        [
+          275,
+          595
+        ],
+        [
+          275,
+          275
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

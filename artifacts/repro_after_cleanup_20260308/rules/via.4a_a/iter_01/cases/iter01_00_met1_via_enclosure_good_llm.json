@@ -1,0 +1,34 @@
+{
+  "case_id": "met1_via_enclosure_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: via.4a_a\nDescription: via.4a_a : 0.15um via must be enclosed by met1\nRunset expression: rectVIA .squares .drc(width == 0.15) .not(m1)\nExpression refs: rectvia, m1\nUpstream chain: L150:m1_wildcard = \"68/20\" | L151:via_wildcard = \"68/44\" | L195:m1 = polygons(m1_wildcard) | L196:via = polygons(via_wildcard) | L1070:rectvia = via\nRunset context: if BEOL | if backend_flow = AL [cand=1]",
+  "lpl": [
+    {
+      "layer": "met1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

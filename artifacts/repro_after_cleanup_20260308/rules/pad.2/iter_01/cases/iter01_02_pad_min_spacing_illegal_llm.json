@@ -1,0 +1,65 @@
+{
+  "case_id": "pad_min_spacing_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: pad.2\nDescription: pad.2 : min. pad spacing : 1.27um\nRunset expression: log(\"START: 76/20 (pad)\") pad.space(1.27, euclidian)\nExpression refs: pad\nUpstream chain: L209:pad = polygons(76, 20)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "pad",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          400
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "pad",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          100,
+          50
+        ],
+        [
+          180,
+          50
+        ],
+        [
+          180,
+          120
+        ],
+        [
+          0,
+          120
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

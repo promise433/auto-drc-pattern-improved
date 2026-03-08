@@ -1,0 +1,36 @@
+{
+  "case_id": "tunm_min_width_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: tunm.1\nDescription: tunm.1 : min. tunm width : 0.41um\nRunset expression: log(\"START: 80/20 (tunm)\") tunm.width(0.41, euclidian)\nExpression refs: tunm\nUpstream chain: L180:tunm = polygons(80, 20)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "tunm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          530,
+          20
+        ],
+        [
+          530,
+          80
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

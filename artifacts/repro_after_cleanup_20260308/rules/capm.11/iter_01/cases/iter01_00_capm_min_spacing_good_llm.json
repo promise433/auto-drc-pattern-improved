@@ -1,0 +1,59 @@
+{
+  "case_id": "capm_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: capm.11\nDescription: capm.11 : Min spacing of capm and met3 not overlapping capm : 0.5um\nRunset expression: (m3.not_interacting(capm)).separation(capm, 0.5, euclidian)\nExpression refs: m3, capm\nUpstream chain: L156:m3_wildcard = \"70/20\" | L201:m3 = polygons(m3_wildcard) | L211:capm = polygons(89, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "capm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1000,
+          0
+        ],
+        [
+          1000,
+          2000
+        ],
+        [
+          0,
+          2000
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "met3",
+      "points": [
+        [
+          1560,
+          0
+        ],
+        [
+          1860,
+          0
+        ],
+        [
+          1860,
+          600
+        ],
+        [
+          1560,
+          600
+        ],
+        [
+          1560,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

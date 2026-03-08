@@ -1,0 +1,109 @@
+{
+  "case_id": "met5_min_area_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: m5.7\nDescription: m5.7 : min. m5 holes area : 0.14um\u00b2\nRunset expression: m5 .holes .with_area(0..0.14)\nExpression refs: m5\nUpstream chain: L162:m5_wildcard = \"72/20\" | L207:m5 = polygons(m5_wildcard)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met5",
+      "points": [
+        [
+          0,
+          1865
+        ],
+        [
+          3465,
+          1865
+        ],
+        [
+          3465,
+          3465
+        ],
+        [
+          0,
+          3465
+        ],
+        [
+          0,
+          1865
+        ]
+      ]
+    },
+    {
+      "layer": "met5",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          3465,
+          0
+        ],
+        [
+          3465,
+          1600
+        ],
+        [
+          0,
+          1600
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "met5",
+      "points": [
+        [
+          0,
+          1600
+        ],
+        [
+          1600,
+          1600
+        ],
+        [
+          1600,
+          1865
+        ],
+        [
+          0,
+          1865
+        ],
+        [
+          0,
+          1600
+        ]
+      ]
+    },
+    {
+      "layer": "met5",
+      "points": [
+        [
+          1865,
+          1600
+        ],
+        [
+          3465,
+          1600
+        ],
+        [
+          3465,
+          1865
+        ],
+        [
+          1865,
+          1865
+        ],
+        [
+          1865,
+          1600
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

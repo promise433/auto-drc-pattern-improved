@@ -1,0 +1,59 @@
+{
+  "case_id": "psdm_min_width_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: psdm.2\nDescription: psdm.2 : min. psdm width in periphery : 0.38um\nRunset expression: psdm .outside(areaid_ce) .width(0.38, euclidian)\nExpression refs: psdm, areaid_ce\nUpstream chain: L166:psdm_wildcard = \"94/20\" | L185:psdm = polygons(psdm_wildcard) | L225:areaid_ce = polygons(81, 2)\nRunset context: if FEOL | else [cand=1] [repaired] [ctx-markers]",
+  "lpl": [
+    {
+      "layer": "psdm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          500,
+          0
+        ],
+        [
+          500,
+          320
+        ],
+        [
+          0,
+          320
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "areaid_ce",
+      "points": [
+        [
+          580,
+          0
+        ],
+        [
+          830,
+          0
+        ],
+        [
+          830,
+          320
+        ],
+        [
+          580,
+          320
+        ],
+        [
+          580,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

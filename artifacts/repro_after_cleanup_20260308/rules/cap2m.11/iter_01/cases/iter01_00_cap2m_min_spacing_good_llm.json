@@ -1,0 +1,59 @@
+{
+  "case_id": "cap2m_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: cap2m.11\nDescription: cap2m.11 : Min spacing of cap2m and met4 not overlapping cap2m : 0.5um\nRunset expression: (m4.not_interacting(cap2m)).separation(cap2m, 0.5, euclidian)\nExpression refs: m4, cap2m\nUpstream chain: L159:m4_wildcard = \"71/20\" | L204:m4 = polygons(m4_wildcard) | L212:cap2m = polygons(97, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "cap2m",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1000,
+          0
+        ],
+        [
+          1000,
+          2000
+        ],
+        [
+          0,
+          2000
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "met4",
+      "points": [
+        [
+          1560,
+          0
+        ],
+        [
+          1860,
+          0
+        ],
+        [
+          1860,
+          600
+        ],
+        [
+          1560,
+          600
+        ],
+        [
+          1560,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

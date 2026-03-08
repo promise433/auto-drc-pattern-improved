@@ -1,0 +1,61 @@
+{
+  "case_id": "m1_via_enclosure_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: via.5a\nDescription: via.5a : min. m1 enclosure of 0.15um via of 2 adjacent edges : 0.085um\nRunset expression: via2_interact\nExpression refs: via2_interact\nUpstream chain: L151:via_wildcard = \"68/44\" | L196:via = polygons(via_wildcard) | L1126:via2_interact = via.interacting(error_corners_via1.polygons(1.dbu))\nRunset context: if BEOL | if backend_flow = AL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          450,
+          300
+        ],
+        [
+          450,
+          450
+        ],
+        [
+          300,
+          450
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "m1",
+      "points": [
+        [
+          260,
+          260
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          480
+        ],
+        [
+          260,
+          480
+        ],
+        [
+          260,
+          260
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

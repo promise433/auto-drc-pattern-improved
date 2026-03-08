@@ -1,0 +1,109 @@
+{
+  "case_id": "via2_max_width_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: via2.3_a\nDescription: via2.3_a : max. width of ring-shaped via2 : 0.205um\nRunset expression: ringVIA2.drc(width >= 0.205)\nExpression refs: ringvia2\nUpstream chain: L154:via2_wildcard = \"69/44\" | L199:via2 = polygons(via2_wildcard) | L1194:ringvia2 = via2.drc(with_holes > 0)\nRunset context: if BEOL | if backend_flow = AL | if SEAL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via2",
+      "points": [
+        [
+          0,
+          1855
+        ],
+        [
+          2120,
+          1855
+        ],
+        [
+          2120,
+          2120
+        ],
+        [
+          0,
+          2120
+        ],
+        [
+          0,
+          1855
+        ]
+      ]
+    },
+    {
+      "layer": "via2",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          2120,
+          0
+        ],
+        [
+          2120,
+          265
+        ],
+        [
+          0,
+          265
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "via2",
+      "points": [
+        [
+          0,
+          265
+        ],
+        [
+          265,
+          265
+        ],
+        [
+          265,
+          1855
+        ],
+        [
+          0,
+          1855
+        ],
+        [
+          0,
+          265
+        ]
+      ]
+    },
+    {
+      "layer": "via2",
+      "points": [
+        [
+          1855,
+          265
+        ],
+        [
+          2120,
+          265
+        ],
+        [
+          2120,
+          1855
+        ],
+        [
+          1855,
+          1855
+        ],
+        [
+          1855,
+          265
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

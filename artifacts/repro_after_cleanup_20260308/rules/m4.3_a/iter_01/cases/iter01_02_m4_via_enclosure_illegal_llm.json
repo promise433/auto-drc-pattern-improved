@@ -1,0 +1,61 @@
+{
+  "case_id": "m4_via_enclosure_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: m4.3_a\nDescription: m4.3_a : via3 must be enclosed by met4\nRunset expression: via3.not(m4)\nExpression refs: via3, m4\nUpstream chain: L157:via3_wildcard = \"70/44\" | L159:m4_wildcard = \"71/20\" | L202:via3 = polygons(via3_wildcard) | L204:m4 = polygons(m4_wildcard)\nRunset context: if BEOL | if backend_flow = AL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via3",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          500,
+          300
+        ],
+        [
+          500,
+          500
+        ],
+        [
+          300,
+          500
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "m4",
+      "points": [
+        [
+          260,
+          260
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          480
+        ],
+        [
+          260,
+          480
+        ],
+        [
+          260,
+          260
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

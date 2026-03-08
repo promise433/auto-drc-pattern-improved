@@ -1,0 +1,34 @@
+{
+  "case_id": "rpm_offgrid_vertex_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: rpm_OFFGRID\nDescription: x.1b : OFFGRID vertex on rpm\nRunset expression: rpm.ongrid(0.005)\nExpression refs: rpm\nUpstream chain: L186:rpm = polygons(86, 20)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "rpm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

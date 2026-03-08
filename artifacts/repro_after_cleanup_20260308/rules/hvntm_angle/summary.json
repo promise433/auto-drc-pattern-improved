@@ -1,0 +1,104 @@
+{
+  "converged": true,
+  "iterations_run": 1,
+  "rule_type": "forbidden_angle",
+  "layer": "hvntm",
+  "threshold_nm": 45,
+  "generator": "llm",
+  "rule_text": "Rule ID: hvntm_angle\nDescription: x.3a : non 45 degree angle hvntm\nRunset expression: hvntm.with_angle(0..45)\nExpression refs: hvntm\nUpstream chain: L183:hvntm = polygons(125, 20)\nRunset context: if OFFGRID",
+  "llm_model": "/home/zhangce/auto drc pattern/models/TinyLlama-1.1B-Chat-v1.0",
+  "llm_repair": true,
+  "llm_good_candidates": 2,
+  "llm_bad_candidates": 4,
+  "llm_illegal_candidates": 1,
+  "llm_feedback_boost": true,
+  "llm_candidate_growth": 2,
+  "llm_max_candidates_per_intent": 8,
+  "target_categories": [
+    "hvntm_angle"
+  ],
+  "initial_delta_nm": 100,
+  "delta_step_nm": 100,
+  "max_iters": 3,
+  "runset_path": "/home/zhangce/.klayout/salt/Efabless_sky130/tech/sky130/drc/sky130A_mr.drc",
+  "iterations": [
+    {
+      "iteration": 1,
+      "delta_nm": 100,
+      "rule_type": "forbidden_angle",
+      "layer": "hvntm",
+      "threshold_nm": 45,
+      "generator": "llm",
+      "rule_text": "Rule ID: hvntm_angle\nDescription: x.3a : non 45 degree angle hvntm\nRunset expression: hvntm.with_angle(0..45)\nExpression refs: hvntm\nUpstream chain: L183:hvntm = polygons(125, 20)\nRunset context: if OFFGRID",
+      "llm_model": "/home/zhangce/auto drc pattern/models/TinyLlama-1.1B-Chat-v1.0",
+      "llm_repair": true,
+      "llm_good_candidates": 2,
+      "llm_bad_candidates": 4,
+      "llm_illegal_candidates": 1,
+      "llm_feedback_boost": true,
+      "target_categories": [
+        "hvntm_angle"
+      ],
+      "good_ok": true,
+      "bad_ok": true,
+      "good_target_hits": 0,
+      "bad_target_hits": 1,
+      "converged_this_iter": true,
+      "next_delta_nm": 200,
+      "delta_action": "steady_step",
+      "next_llm_good_candidates": 2,
+      "next_llm_bad_candidates": 4,
+      "next_llm_illegal_candidates": 1,
+      "llm_feedback_actions": [],
+      "cases": [
+        {
+          "case_id": "hvntm_forbidden_angle_good_llm",
+          "intent": "GOOD",
+          "geometry_valid": true,
+          "gds_path": "/home/zhangce/auto drc pattern copy/artifacts/repro_after_cleanup_20260308/rules/hvntm_angle/iter_01/gds/hvntm_forbidden_angle_good_llm.gds",
+          "report_path": "/home/zhangce/auto drc pattern copy/artifacts/repro_after_cleanup_20260308/rules/hvntm_angle/iter_01/reports/hvntm_forbidden_angle_good_llm.lyrdb",
+          "drc_returncode": 0,
+          "drc_items_total": 2,
+          "drc_items_target": 0,
+          "intent_match": true,
+          "category_hits": {
+            "hvntm.1": 2
+          },
+          "drc_stdout_tail": "c:1599\n    Edge pairs: 0 (flat)  0 (hierarchical)\n    Elapsed: 0.000s  Memory: 1116.00M\n\"with_angle\" in: sky130A_mr.drc:1603\n    Edge pairs: 0 (flat)  0 (hierarchical)\n    Elapsed: 0.000s  Memory: 1116.00M\n\"output\" in: sky130A_mr.drc:1603\n    Edge pairs: 0 (flat)  0 (hierarchical)\n    Elapsed: 0.000s  Memory: 1116.00M\n\"ongrid\" in: sky130A_mr.drc:1607\n    Edge pairs: 0 (flat)  0 (hierarchical)\n    Elapsed: 0.000s  Memory: 1116.00M\n\"output\" in: sky130A_mr.drc:1607\n    Edge pairs: 0 (flat)  0 (hierarchical)\n    Elapsed: 0.000s  Memory: 1116.00M\nWriting report database: /home/zhangce/auto drc pattern copy/artifacts/repro_after_cleanup_20260308/rules/hvntm_angle/iter_01/reports/hvntm_forbidden_angle_good_llm.lyrdb ..\nTotal elapsed: 0.610s  Memory: 1116.00M\nArgs:\n\tsram_exclude: false\n\tfeol: true\n\tbeol: true\n\tfloating_met: false\n\toffgrid: true\n\tseal: \n \nCell exclusion list:\n   rule    | cell\n   nwell.6 | sky130_fd_io__gpiov2_amux, sky130_fd_io__simple_pad_and_busses\n \nrelease 2024.2.11_01.09\n",
+          "drc_stderr_tail": ""
+        },
+        {
+          "case_id": "hvntm_forbidden_angle_bad_llm",
+          "intent": "BAD",
+          "geometry_valid": true,
+          "gds_path": "/home/zhangce/auto drc pattern copy/artifacts/repro_after_cleanup_20260308/rules/hvntm_angle/iter_01/gds/hvntm_forbidden_angle_bad_llm.gds",
+          "report_path": "/home/zhangce/auto drc pattern copy/artifacts/repro_after_cleanup_20260308/rules/hvntm_angle/iter_01/reports/hvntm_forbidden_angle_bad_llm.lyrdb",
+          "drc_returncode": 0,
+          "drc_items_total": 7,
+          "drc_items_target": 1,
+          "intent_match": true,
+          "category_hits": {
+            "hvntm.1": 6,
+            "hvntm_angle": 1
+          },
+          "drc_stdout_tail": "rc:1599\n    Edge pairs: 0 (flat)  0 (hierarchical)\n    Elapsed: 0.010s  Memory: 1115.00M\n\"with_angle\" in: sky130A_mr.drc:1603\n    Edge pairs: 0 (flat)  0 (hierarchical)\n    Elapsed: 0.000s  Memory: 1115.00M\n\"output\" in: sky130A_mr.drc:1603\n    Edge pairs: 0 (flat)  0 (hierarchical)\n    Elapsed: 0.000s  Memory: 1115.00M\n\"ongrid\" in: sky130A_mr.drc:1607\n    Edge pairs: 0 (flat)  0 (hierarchical)\n    Elapsed: 0.000s  Memory: 1115.00M\n\"output\" in: sky130A_mr.drc:1607\n    Edge pairs: 0 (flat)  0 (hierarchical)\n    Elapsed: 0.000s  Memory: 1115.00M\nWriting report database: /home/zhangce/auto drc pattern copy/artifacts/repro_after_cleanup_20260308/rules/hvntm_angle/iter_01/reports/hvntm_forbidden_angle_bad_llm.lyrdb ..\nTotal elapsed: 0.610s  Memory: 1115.00M\nArgs:\n\tsram_exclude: false\n\tfeol: true\n\tbeol: true\n\tfloating_met: false\n\toffgrid: true\n\tseal: \n \nCell exclusion list:\n   rule    | cell\n   nwell.6 | sky130_fd_io__gpiov2_amux, sky130_fd_io__simple_pad_and_busses\n \nrelease 2024.2.11_01.09\n",
+          "drc_stderr_tail": ""
+        },
+        {
+          "case_id": "hvntm_forbidden_angle_illegal_llm",
+          "intent": "ILLEGAL",
+          "geometry_valid": false,
+          "gds_path": "/home/zhangce/auto drc pattern copy/artifacts/repro_after_cleanup_20260308/rules/hvntm_angle/iter_01/gds/hvntm_forbidden_angle_illegal_llm.gds",
+          "report_path": "/home/zhangce/auto drc pattern copy/artifacts/repro_after_cleanup_20260308/rules/hvntm_angle/iter_01/reports/hvntm_forbidden_angle_illegal_llm.lyrdb",
+          "drc_returncode": -1,
+          "drc_items_total": null,
+          "drc_items_target": null,
+          "intent_match": true,
+          "category_hits": {},
+          "drc_stdout_tail": "skipped DRC: invalid geometry",
+          "drc_stderr_tail": ""
+        }
+      ]
+    }
+  ]
+}

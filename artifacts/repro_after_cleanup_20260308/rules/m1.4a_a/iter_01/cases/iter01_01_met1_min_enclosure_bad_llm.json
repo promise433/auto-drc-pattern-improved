@@ -1,0 +1,59 @@
+{
+  "case_id": "met1_min_enclosure_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: m1.4a_a\nDescription: m1.4a_a : mcon periph must be enclosed by met1 for specific cells\nRunset expression: in_cell6_m1.not(m1)\nExpression refs: in_cell6_m1, m1\nUpstream chain: L150:m1_wildcard = \"68/20\" | L195:m1 = polygons(m1_wildcard) | L1024:in_cell6_m1 = in_cell6.input(m1_wildcard)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "mcon",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          470,
+          300
+        ],
+        [
+          470,
+          470
+        ],
+        [
+          300,
+          470
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "met1",
+      "points": [
+        [
+          385,
+          300
+        ],
+        [
+          470,
+          300
+        ],
+        [
+          470,
+          470
+        ],
+        [
+          385,
+          470
+        ],
+        [
+          385,
+          300
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

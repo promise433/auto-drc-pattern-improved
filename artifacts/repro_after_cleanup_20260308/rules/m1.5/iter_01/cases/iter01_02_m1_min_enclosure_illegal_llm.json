@@ -1,0 +1,61 @@
+{
+  "case_id": "m1_min_enclosure_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: m1.5\nDescription: m1.5 : min. m1 enclosure of mcon of 2 adjacent edges : 0.06um\nRunset expression: mconnotace.interacting(error_corners_m1.polygons(1.dbu)) mconnotace_interact_m1\nExpression refs: mconnotace\nUpstream chain: L148:mcon_wildcard = \"67/44\" | L193:mcon = polygons(mcon_wildcard) | L225:areaid_ce = polygons(81, 2) | L936:mconnotace = mcon.not(areaid_ce)\nRunset context: if BEOL | if backend_flow = AL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "mcon",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          470,
+          300
+        ],
+        [
+          470,
+          470
+        ],
+        [
+          300,
+          470
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "m1",
+      "points": [
+        [
+          260,
+          260
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          480
+        ],
+        [
+          260,
+          480
+        ],
+        [
+          260,
+          260
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

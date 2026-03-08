@@ -1,0 +1,59 @@
+{
+  "case_id": "capm_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: capm.2a\nDescription: capm.2a : min. capm spacing : 0.84um\nRunset expression: capm.space(0.84, euclidian)\nExpression refs: capm\nUpstream chain: L211:capm = polygons(89, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "capm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1000,
+          0
+        ],
+        [
+          1000,
+          2000
+        ],
+        [
+          0,
+          2000
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "capm",
+      "points": [
+        [
+          1900,
+          0
+        ],
+        [
+          2900,
+          0
+        ],
+        [
+          2900,
+          2000
+        ],
+        [
+          1900,
+          2000
+        ],
+        [
+          1900,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

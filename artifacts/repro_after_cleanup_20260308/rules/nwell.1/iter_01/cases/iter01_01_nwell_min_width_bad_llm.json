@@ -1,0 +1,34 @@
+{
+  "case_id": "nwell_min_width_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: nwell.1\nDescription: nwell.1 : min. nwell width : 0.84um\nRunset expression: log(\"START: 64/20 (nwell)\") nwell.width(0.84, euclidian)\nExpression refs: nwell\nUpstream chain: L167:nwell_wildcard = \"64/20\" | L171:nwell = polygons(nwell_wildcard)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "nwell",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          960,
+          0
+        ],
+        [
+          960,
+          780
+        ],
+        [
+          0,
+          780
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

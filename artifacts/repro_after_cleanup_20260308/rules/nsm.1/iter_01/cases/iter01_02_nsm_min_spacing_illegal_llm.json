@@ -1,0 +1,65 @@
+{
+  "case_id": "nsm_min_spacing_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: nsm.1\nDescription: nsm.1 : nsm min. spacing : 4.0um\nRunset expression: log(\"START: 61/20 (nsm)\") nsm.space(4.0, euclidian)\nExpression refs: nsm\nUpstream chain: L210:nsm = polygons(61, 20)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "nsm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          400
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "nsm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          100,
+          50
+        ],
+        [
+          180,
+          50
+        ],
+        [
+          180,
+          120
+        ],
+        [
+          0,
+          120
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

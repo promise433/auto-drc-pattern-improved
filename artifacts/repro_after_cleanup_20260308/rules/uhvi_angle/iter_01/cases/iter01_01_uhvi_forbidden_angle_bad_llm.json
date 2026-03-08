@@ -1,0 +1,38 @@
+{
+  "case_id": "uhvi_forbidden_angle_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: uhvi_angle\nDescription: x.3a : non 45 degree angle uhvi\nRunset expression: uhvi.with_angle(0..45)\nExpression refs: uhvi\nUpstream chain: L215:uhvi = polygons(74, 22)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "uhvi",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          300,
+          100
+        ],
+        [
+          600,
+          110
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ],
+        [
+          100,
+          100
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

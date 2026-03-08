@@ -1,0 +1,32 @@
+{
+  "case_id": "via4_forbidden_angle_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: via4_angle\nDescription: x.2 : non 90 degree angle via4\nRunset expression: via4.with_angle(0..90)\nExpression refs: via4\nUpstream chain: L160:via4_wildcard = \"71/44\" | L205:via4 = polygons(via4_wildcard)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via4",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          220,
+          160
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: polygon is not closed"
+  ]
+}

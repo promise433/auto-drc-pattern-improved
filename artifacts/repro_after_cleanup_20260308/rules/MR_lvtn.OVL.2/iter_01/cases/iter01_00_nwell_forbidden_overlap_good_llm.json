@@ -1,0 +1,34 @@
+{
+  "case_id": "nwell_forbidden_overlap_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: MR_lvtn.OVL.2\nDescription: MR_lvtn.OVL.2 : lvtn must not straddle nwell\nRunset expression: lvtn .interacting(nwell) .not_inside(nwell) .edges .and(nwell)\nExpression refs: lvtn, nwell\nUpstream chain: L167:nwell_wildcard = \"64/20\" | L171:nwell = polygons(nwell_wildcard) | L181:lvtn = polygons(125, 44)\nRunset context: if FEOL [cand=1]",
+  "lpl": [
+    {
+      "layer": "nwell",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

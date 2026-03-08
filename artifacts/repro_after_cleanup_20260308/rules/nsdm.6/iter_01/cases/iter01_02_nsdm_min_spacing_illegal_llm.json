@@ -1,0 +1,65 @@
+{
+  "case_id": "nsdm_min_spacing_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: nsdm.6\nDescription: nsdm.6 : min. nsdm spacing in areaid:ce : 0.29um\nRunset expression: nsdm .inside(areaid_ce) .space(0.29, euclidian)\nExpression refs: nsdm, areaid_ce\nUpstream chain: L164:nsdm_wildcard = \"93/44\" | L184:nsdm = polygons(nsdm_wildcard) | L225:areaid_ce = polygons(81, 2)\nRunset context: if FEOL | else [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "nsdm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          380,
+          0
+        ],
+        [
+          380,
+          760
+        ],
+        [
+          0,
+          760
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "nsdm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          100,
+          50
+        ],
+        [
+          180,
+          50
+        ],
+        [
+          180,
+          120
+        ],
+        [
+          0,
+          120
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "case_id": "li1_min_spacing_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: li.3\nDescription: li.3 : min. li spacing outside or crossing areaid:ce : 0.17um\nRunset expression: li_outside_or_touching_areaidce.space(0.17, euclidian)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "li1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          170,
+          0
+        ],
+        [
+          170,
+          400
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "li1",
+      "points": [
+        [
+          280,
+          0
+        ],
+        [
+          450,
+          0
+        ],
+        [
+          450,
+          400
+        ],
+        [
+          280,
+          400
+        ],
+        [
+          280,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

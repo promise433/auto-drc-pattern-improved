@@ -1,0 +1,38 @@
+{
+  "case_id": "mcon_forbidden_angle_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: ct.1\nDescription: ct.1: non-ring mcon should be rectangular\nRunset expression: rectMCON.non_rectangles\nExpression refs: rectmcon\nUpstream chain: L148:mcon_wildcard = \"67/44\" | L193:mcon = polygons(mcon_wildcard) | L941:rectmcon = mcon\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "mcon",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          300,
+          100
+        ],
+        [
+          600,
+          110
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ],
+        [
+          100,
+          100
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

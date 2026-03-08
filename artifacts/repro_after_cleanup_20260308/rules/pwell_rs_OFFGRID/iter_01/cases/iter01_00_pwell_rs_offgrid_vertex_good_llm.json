@@ -1,0 +1,34 @@
+{
+  "case_id": "pwell_rs_offgrid_vertex_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: pwell_rs_OFFGRID\nDescription: x.1b : OFFGRID vertex on pwell_rs\nRunset expression: pwell_rs.ongrid(0.005)\nExpression refs: pwell_rs\nUpstream chain: L261:pwell_rs = polygons(64, 13)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "pwell_rs",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

@@ -1,0 +1,59 @@
+{
+  "case_id": "dnwell_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: dnwell.2\nDescription: dnwell.2 : min. dnwell spacing : 6.3um\nRunset expression: dnwell .not(uhvi.or(vhvi)) .space(6.3, euclidian)\nExpression refs: dnwell, uhvi, vhvi\nUpstream chain: L172:dnwell = polygons(64, 18) | L214:vhvi = polygons(74, 21) | L215:uhvi = polygons(74, 22)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "dnwell",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          3000,
+          0
+        ],
+        [
+          3000,
+          6000
+        ],
+        [
+          0,
+          6000
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "dnwell",
+      "points": [
+        [
+          9360,
+          0
+        ],
+        [
+          12360,
+          0
+        ],
+        [
+          12360,
+          6000
+        ],
+        [
+          9360,
+          6000
+        ],
+        [
+          9360,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

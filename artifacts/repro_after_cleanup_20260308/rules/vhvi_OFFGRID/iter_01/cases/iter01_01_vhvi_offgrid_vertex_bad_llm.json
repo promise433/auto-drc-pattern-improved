@@ -1,0 +1,34 @@
+{
+  "case_id": "vhvi_offgrid_vertex_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: vhvi_OFFGRID\nDescription: x.1b : OFFGRID vertex on vhvi\nRunset expression: vhvi.ongrid(0.005)\nExpression refs: vhvi\nUpstream chain: L214:vhvi = polygons(74, 21)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "vhvi",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          201,
+          1
+        ],
+        [
+          201,
+          201
+        ],
+        [
+          1,
+          201
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

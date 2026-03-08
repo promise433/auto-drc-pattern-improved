@@ -1,0 +1,59 @@
+{
+  "case_id": "nsdm_min_width_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: nsdm.5\nDescription: nsdm.5 : min. nsdm width in areaid:ce : 0.29um\nRunset expression: nsdm .inside(areaid_ce) .width(0.29, euclidian)\nExpression refs: nsdm, areaid_ce\nUpstream chain: L164:nsdm_wildcard = \"93/44\" | L184:nsdm = polygons(nsdm_wildcard) | L225:areaid_ce = polygons(81, 2)\nRunset context: if FEOL | else [cand=1] [repaired] [ctx-markers]",
+  "lpl": [
+    {
+      "layer": "nsdm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          410,
+          0
+        ],
+        [
+          410,
+          230
+        ],
+        [
+          0,
+          230
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "areaid_ce",
+      "points": [
+        [
+          -80,
+          -80
+        ],
+        [
+          490,
+          -80
+        ],
+        [
+          490,
+          310
+        ],
+        [
+          -80,
+          310
+        ],
+        [
+          -80,
+          -80
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

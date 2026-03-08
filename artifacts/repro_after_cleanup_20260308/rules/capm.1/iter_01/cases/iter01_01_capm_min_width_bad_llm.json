@@ -1,0 +1,34 @@
+{
+  "case_id": "capm_min_width_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: capm.1\nDescription: capm.1 : min. capm width : 1.0um\nRunset expression: log(\"START: 89/44 (capm)\") capm.width(1.0, euclidian)\nExpression refs: capm\nUpstream chain: L211:capm = polygons(89, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "capm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1120,
+          0
+        ],
+        [
+          1120,
+          940
+        ],
+        [
+          0,
+          940
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

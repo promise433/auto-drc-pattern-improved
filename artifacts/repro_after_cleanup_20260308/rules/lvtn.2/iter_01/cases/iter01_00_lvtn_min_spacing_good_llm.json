@@ -1,0 +1,59 @@
+{
+  "case_id": "lvtn_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: lvtn.2\nDescription: lvtn.2 : min. lvtn spacing : 0.38um\nRunset expression: lvtn.space(0.38, euclidian)\nExpression refs: lvtn\nUpstream chain: L181:lvtn = polygons(125, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "lvtn",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          400
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "lvtn",
+      "points": [
+        [
+          520,
+          0
+        ],
+        [
+          600,
+          0
+        ],
+        [
+          600,
+          400
+        ],
+        [
+          520,
+          400
+        ],
+        [
+          520,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

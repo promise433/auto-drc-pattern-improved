@@ -1,0 +1,65 @@
+{
+  "case_id": "met5_min_spacing_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: m5.2\nDescription: m5.2 : min. m5 spacing : 1.6um\nRunset expression: m5.space(1.6, euclidian)\nExpression refs: m5\nUpstream chain: L162:m5_wildcard = \"72/20\" | L207:m5 = polygons(m5_wildcard)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met5",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1600,
+          0
+        ],
+        [
+          1600,
+          3200
+        ],
+        [
+          0,
+          3200
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "met5",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          100,
+          50
+        ],
+        [
+          180,
+          50
+        ],
+        [
+          180,
+          120
+        ],
+        [
+          0,
+          120
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

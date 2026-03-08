@@ -1,0 +1,59 @@
+{
+  "case_id": "li1_min_area_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: li.6\nDescription: li.6 : min. li area : 0.0561um\u00b2\nRunset expression: linotace.with_area(nil, 0.0561)\nExpression refs: linotace\nUpstream chain: L146:li_wildcard = \"67/20\" | L191:li = polygons(li_wildcard) | L225:areaid_ce = polygons(81, 2) | L910:linotace = li.not(li.interacting(areaid_ce))\nRunset context: if BEOL [cand=1] [repaired] [ctx-markers]",
+  "lpl": [
+    {
+      "layer": "li1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          170,
+          0
+        ],
+        [
+          170,
+          165
+        ],
+        [
+          0,
+          165
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "areaid_ce",
+      "points": [
+        [
+          250,
+          0
+        ],
+        [
+          335,
+          0
+        ],
+        [
+          335,
+          165
+        ],
+        [
+          250,
+          165
+        ],
+        [
+          250,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

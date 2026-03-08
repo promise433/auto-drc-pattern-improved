@@ -1,0 +1,61 @@
+{
+  "case_id": "nsdm_forbidden_overlap_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: nsdm_psdm_overlap\nDescription: nsdm_psdm_overlap : nsdm overlaps psdm over active\nRunset expression: psdm .and(nsdm) .and(diff)\nExpression refs: psdm, nsdm, diff\nUpstream chain: L164:nsdm_wildcard = \"93/44\" | L166:psdm_wildcard = \"94/20\" | L169:diff = input(65, 20) | L184:nsdm = polygons(nsdm_wildcard) | L185:psdm = polygons(psdm_wildcard)\nRunset context: if FEOL | else [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "nsdm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          200,
+          0
+        ],
+        [
+          200,
+          200
+        ],
+        [
+          0,
+          200
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "psdm",
+      "points": [
+        [
+          100,
+          0
+        ],
+        [
+          230,
+          20
+        ],
+        [
+          230,
+          200
+        ],
+        [
+          100,
+          200
+        ],
+        [
+          100,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

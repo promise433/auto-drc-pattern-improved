@@ -1,0 +1,36 @@
+{
+  "case_id": "diff_min_width_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: difftap.2\nDescription: difftap.2 : min. diff width inside areadid:ce : 0.14um\nRunset expression: diff .inside(areaid_ce) .width(0.14, euclidian)\nExpression refs: diff, areaid_ce\nUpstream chain: L169:diff = input(65, 20) | L225:areaid_ce = polygons(81, 2)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "diff",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          20
+        ],
+        [
+          400,
+          80
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

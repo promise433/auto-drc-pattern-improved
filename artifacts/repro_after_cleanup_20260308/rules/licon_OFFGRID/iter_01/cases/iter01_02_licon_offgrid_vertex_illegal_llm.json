@@ -1,0 +1,36 @@
+{
+  "case_id": "licon_offgrid_vertex_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: licon_OFFGRID\nDescription: x.1b : OFFGRID vertex on licon\nRunset expression: licon.ongrid(0.005)\nExpression refs: licon\nUpstream chain: L189:licon = polygons(66, 44)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "licon",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          201,
+          21
+        ],
+        [
+          201,
+          201
+        ],
+        [
+          1,
+          201
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

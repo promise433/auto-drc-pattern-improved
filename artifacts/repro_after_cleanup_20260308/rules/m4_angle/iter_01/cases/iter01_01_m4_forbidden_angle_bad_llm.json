@@ -1,0 +1,38 @@
+{
+  "case_id": "m4_forbidden_angle_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: m4_angle\nDescription: x.3a : non 45 degree angle m4\nRunset expression: m4.with_angle(0..45)\nExpression refs: m4\nUpstream chain: L159:m4_wildcard = \"71/20\" | L204:m4 = polygons(m4_wildcard)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "m4",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          300,
+          100
+        ],
+        [
+          600,
+          110
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ],
+        [
+          100,
+          100
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

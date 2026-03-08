@@ -1,0 +1,34 @@
+{
+  "case_id": "m1_min_enclosure_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: m1.4a\nDescription: m1.4a : min. m1 enclosure of mcon for specific cells : 0.005um\nRunset expression: in_cell6_m1.enclosing(mcon, 0.005, euclidian)\nExpression refs: in_cell6_m1, mcon\nUpstream chain: L148:mcon_wildcard = \"67/44\" | L150:m1_wildcard = \"68/20\" | L193:mcon = polygons(mcon_wildcard) | L1024:in_cell6_m1 = in_cell6.input(m1_wildcard)\nRunset context: if BEOL [cand=1]",
+  "lpl": [
+    {
+      "layer": "m1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

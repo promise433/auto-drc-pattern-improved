@@ -1,0 +1,34 @@
+{
+  "case_id": "li1_min_width_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: li.8\nDescription: li.8 : min. li core width : 0.14um\nRunset expression: li_core.width(0.14, euclidian)\nExpression refs: li_core\nUpstream chain: L146:li_wildcard = \"67/20\" | L191:li = polygons(li_wildcard) | L225:areaid_ce = polygons(81, 2) | L915:li_core = li.and(areaid_ce)\nRunset context: if BEOL [cand=1]",
+  "lpl": [
+    {
+      "layer": "li1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

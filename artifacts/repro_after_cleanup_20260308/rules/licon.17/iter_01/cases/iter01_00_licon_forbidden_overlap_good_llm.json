@@ -1,0 +1,34 @@
+{
+  "case_id": "licon_forbidden_overlap_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: licon.17\nDescription: licon.17 : Licons may not overlap both poly and (diff or tap)\nRunset expression: licon .and(poly) .and(difftap)\nExpression refs: licon, poly, difftap\nUpstream chain: L169:diff = input(65, 20) | L170:tap = polygons(65, 44) | L182:poly = polygons(66, 20) | L189:licon = polygons(66, 44) | L401:difftap = diff.or(tap)\nRunset context: if FEOL [cand=1]",
+  "lpl": [
+    {
+      "layer": "licon",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

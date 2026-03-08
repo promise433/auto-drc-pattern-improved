@@ -1,0 +1,32 @@
+{
+  "case_id": "poly_forbidden_angle_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: poly_angle\nDescription: x.2 : non 90 degree angle poly\nRunset expression: poly.with_angle(0..90)\nExpression refs: poly\nUpstream chain: L182:poly = polygons(66, 20)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "poly",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          220,
+          160
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: polygon is not closed"
+  ]
+}

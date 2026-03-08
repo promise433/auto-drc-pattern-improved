@@ -1,0 +1,34 @@
+{
+  "case_id": "hvntm_forbidden_angle_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: hvntm_angle\nDescription: x.3a : non 45 degree angle hvntm\nRunset expression: hvntm.with_angle(0..45)\nExpression refs: hvntm\nUpstream chain: L183:hvntm = polygons(125, 20)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "hvntm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

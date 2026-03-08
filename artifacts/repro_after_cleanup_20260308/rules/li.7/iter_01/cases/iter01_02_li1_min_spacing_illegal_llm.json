@@ -1,0 +1,65 @@
+{
+  "case_id": "li1_min_spacing_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: li.7\nDescription: li.7 : min. li core spacing : 0.14um\nRunset expression: li_core.space(0.14, euclidian)\nExpression refs: li_core\nUpstream chain: L146:li_wildcard = \"67/20\" | L191:li = polygons(li_wildcard) | L225:areaid_ce = polygons(81, 2) | L915:li_core = li.and(areaid_ce)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "li1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          170,
+          0
+        ],
+        [
+          170,
+          400
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "li1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          100,
+          50
+        ],
+        [
+          180,
+          50
+        ],
+        [
+          180,
+          120
+        ],
+        [
+          0,
+          120
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

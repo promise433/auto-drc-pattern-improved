@@ -1,0 +1,34 @@
+{
+  "case_id": "met1_width_good",
+  "intent": "GOOD",
+  "description": "width 160nm >= min_width 140nm",
+  "lpl": [
+    {
+      "layer": "met1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

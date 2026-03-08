@@ -1,0 +1,61 @@
+{
+  "case_id": "m3_via_enclosure_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: via3.4\nDescription: via3.4 : min. m3 enclosure of via3 : 0.06um\nRunset expression: m3.enclosing(via3, 0.06, euclidian)\nExpression refs: m3, via3\nUpstream chain: L156:m3_wildcard = \"70/20\" | L157:via3_wildcard = \"70/44\" | L201:m3 = polygons(m3_wildcard) | L202:via3 = polygons(via3_wildcard)\nRunset context: if BEOL | if backend_flow = AL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via3",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          500,
+          300
+        ],
+        [
+          500,
+          500
+        ],
+        [
+          300,
+          500
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "m3",
+      "points": [
+        [
+          260,
+          260
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          480
+        ],
+        [
+          260,
+          480
+        ],
+        [
+          260,
+          260
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

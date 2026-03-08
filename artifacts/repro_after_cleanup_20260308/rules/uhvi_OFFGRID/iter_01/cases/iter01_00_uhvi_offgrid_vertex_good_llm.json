@@ -1,0 +1,34 @@
+{
+  "case_id": "uhvi_offgrid_vertex_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: uhvi_OFFGRID\nDescription: x.1b : OFFGRID vertex on uhvi\nRunset expression: uhvi.ongrid(0.005)\nExpression refs: uhvi\nUpstream chain: L215:uhvi = polygons(74, 22)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "uhvi",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

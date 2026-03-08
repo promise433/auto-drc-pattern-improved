@@ -1,0 +1,34 @@
+{
+  "case_id": "via3_offgrid_vertex_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: via3_OFFGRID\nDescription: x.1b : OFFGRID vertex on via3\nRunset expression: via3.ongrid(0.005)\nExpression refs: via3\nUpstream chain: L157:via3_wildcard = \"70/44\" | L202:via3 = polygons(via3_wildcard)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via3",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          201,
+          1
+        ],
+        [
+          201,
+          201
+        ],
+        [
+          1,
+          201
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

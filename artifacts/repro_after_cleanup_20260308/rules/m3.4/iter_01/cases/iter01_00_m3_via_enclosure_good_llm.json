@@ -1,0 +1,34 @@
+{
+  "case_id": "m3_via_enclosure_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: m3.4\nDescription: m3.4 : min. m3 enclosure of via2 : 0.065um\nRunset expression: m3.enclosing(via2, 0.065, euclidian)\nExpression refs: m3, via2\nUpstream chain: L154:via2_wildcard = \"69/44\" | L156:m3_wildcard = \"70/20\" | L199:via2 = polygons(via2_wildcard) | L201:m3 = polygons(m3_wildcard)\nRunset context: if BEOL | if backend_flow = AL [cand=1]",
+  "lpl": [
+    {
+      "layer": "m3",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

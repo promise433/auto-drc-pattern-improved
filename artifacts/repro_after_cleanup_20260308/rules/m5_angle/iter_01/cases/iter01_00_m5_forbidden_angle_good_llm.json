@@ -1,0 +1,34 @@
+{
+  "case_id": "m5_forbidden_angle_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: m5_angle\nDescription: x.3a : non 45 degree angle m5\nRunset expression: m5.with_angle(0..45)\nExpression refs: m5\nUpstream chain: L162:m5_wildcard = \"72/20\" | L207:m5 = polygons(m5_wildcard)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "m5",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

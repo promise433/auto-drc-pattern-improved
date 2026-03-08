@@ -1,0 +1,36 @@
+{
+  "case_id": "rdl_forbidden_use_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: MR_rdl.CON.1\nDescription: MR_rdl.CON.1 : use of rdl layer is prohibited\nRunset expression: rdl\nExpression refs: rdl\nUpstream chain: L213:rdl = polygons(74, 20)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "rdl",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          200,
+          20
+        ],
+        [
+          200,
+          200
+        ],
+        [
+          0,
+          200
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

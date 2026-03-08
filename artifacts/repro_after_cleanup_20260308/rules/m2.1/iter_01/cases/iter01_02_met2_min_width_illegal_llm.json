@@ -1,0 +1,36 @@
+{
+  "case_id": "met2_min_width_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: m2.1\nDescription: m2.1 : min. m2 width : 0.14um\nRunset expression: m2.width(0.14, euclidian)\nExpression refs: m2\nUpstream chain: L153:m2_wildcard = \"69/20\" | L198:m2 = polygons(m2_wildcard)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met2",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          20
+        ],
+        [
+          400,
+          80
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

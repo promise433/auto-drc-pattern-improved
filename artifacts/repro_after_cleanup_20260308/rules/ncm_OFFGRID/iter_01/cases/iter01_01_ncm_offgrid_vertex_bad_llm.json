@@ -1,0 +1,34 @@
+{
+  "case_id": "ncm_offgrid_vertex_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: ncm_OFFGRID\nDescription: x.1b : OFFGRID vertex on ncm\nRunset expression: ncm.ongrid(0.005)\nExpression refs: ncm\nUpstream chain: L221:ncm = polygons(92, 44)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "ncm",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          201,
+          1
+        ],
+        [
+          201,
+          201
+        ],
+        [
+          1,
+          201
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

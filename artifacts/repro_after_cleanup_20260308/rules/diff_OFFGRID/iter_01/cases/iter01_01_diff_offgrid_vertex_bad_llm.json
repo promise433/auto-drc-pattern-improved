@@ -1,0 +1,34 @@
+{
+  "case_id": "diff_offgrid_vertex_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: diff_OFFGRID\nDescription: x.1b : OFFGRID vertex on diff\nRunset expression: diff.ongrid(0.005)\nExpression refs: diff\nUpstream chain: L169:diff = input(65, 20)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "diff",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          201,
+          1
+        ],
+        [
+          201,
+          201
+        ],
+        [
+          1,
+          201
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

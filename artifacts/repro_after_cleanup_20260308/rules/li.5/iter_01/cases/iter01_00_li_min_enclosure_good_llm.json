@@ -1,0 +1,34 @@
+{
+  "case_id": "li_min_enclosure_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: li.5\nDescription: li.5 : min. li enclosure of licon of 2 adjacent edges : 0.08um\nRunset expression: li_interact\nExpression refs: li_interact\nUpstream chain: L189:licon = polygons(66, 44) | L225:areaid_ce = polygons(81, 2) | L901:licon_peri = licon.not(areaid_ce) | L904:error_corners = li_edges_with_less_enclosure.width(angle_limit(100.0), 1.dbu) | L905:li_interact = licon_peri.interacting(error_corners.polygons(1.dbu))\nRunset context: if BEOL [cand=1]",
+  "lpl": [
+    {
+      "layer": "li",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

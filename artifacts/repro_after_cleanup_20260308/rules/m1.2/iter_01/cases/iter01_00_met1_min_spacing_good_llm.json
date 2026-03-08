@@ -1,0 +1,59 @@
+{
+  "case_id": "met1_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: m1.2\nDescription: m1.2 : min. m1 spacing : 0.14um\nRunset expression: non_huge_m1.space(0.14, euclidian)\nExpression refs: non_huge_m1\nUpstream chain: L150:m1_wildcard = \"68/20\" | L195:m1 = polygons(m1_wildcard) | L981:huge_m1 = m1.sized(-1.5).sized(1.5).snap(0.005) & m1 | L982:non_huge_m1 = m1.edges - huge_m1\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          140,
+          0
+        ],
+        [
+          140,
+          400
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "met1",
+      "points": [
+        [
+          340,
+          0
+        ],
+        [
+          480,
+          0
+        ],
+        [
+          480,
+          400
+        ],
+        [
+          340,
+          400
+        ],
+        [
+          340,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

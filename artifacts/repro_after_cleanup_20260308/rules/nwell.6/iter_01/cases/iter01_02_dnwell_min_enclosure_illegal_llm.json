@@ -1,0 +1,136 @@
+{
+  "case_id": "dnwell_min_enclosure_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: nwell.6\nDescription: nwell.6 : min enclosure of nwellHole by dnwell : 1.03um\nRunset expression: dnwell.enclosing(nwell_interact.holes, 1.03, euclidian)\nExpression refs: dnwell, nwell_interact\nUpstream chain: L167:nwell_wildcard = \"64/20\" | L172:dnwell = polygons(64, 18) | L299:not_sram = layout(source.cell_obj).select(\"-*sky130_sram_*kbyte_*\") | L302:not_sram_nwell = not_sram.input(nwell_wildcard) | L311:not_io_nwell = not_io.input(nwell_wildcard) | L323:nwell_interact = not_sram_nwell.and(not_io_nwell).merge\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "nwell",
+      "points": [
+        [
+          300,
+          3660
+        ],
+        [
+          4500,
+          3660
+        ],
+        [
+          4500,
+          4500
+        ],
+        [
+          300,
+          4500
+        ],
+        [
+          300,
+          3660
+        ]
+      ]
+    },
+    {
+      "layer": "nwell",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          4500,
+          300
+        ],
+        [
+          4500,
+          1140
+        ],
+        [
+          300,
+          1140
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "nwell",
+      "points": [
+        [
+          300,
+          1140
+        ],
+        [
+          1140,
+          1140
+        ],
+        [
+          1140,
+          3660
+        ],
+        [
+          300,
+          3660
+        ],
+        [
+          300,
+          1140
+        ]
+      ]
+    },
+    {
+      "layer": "nwell",
+      "points": [
+        [
+          3660,
+          1140
+        ],
+        [
+          4500,
+          1140
+        ],
+        [
+          4500,
+          3660
+        ],
+        [
+          3660,
+          3660
+        ],
+        [
+          3660,
+          1140
+        ]
+      ]
+    },
+    {
+      "layer": "dnwell",
+      "points": [
+        [
+          260,
+          260
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          480
+        ],
+        [
+          260,
+          480
+        ],
+        [
+          260,
+          260
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[4]: non-manhattan edge at segment 0"
+  ]
+}

@@ -1,0 +1,59 @@
+{
+  "case_id": "hvi_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: hvi.2a\nDescription: hvi.2a : min. hvi spacing : 0.7um\nRunset expression: hvi_peri.space(0.7, euclidian)\nExpression refs: hvi_peri\nUpstream chain: L179:hvi = polygons(75, 20) | L225:areaid_ce = polygons(81, 2) | L1470:hvi_peri = hvi.not(areaid_ce)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "hvi",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          600,
+          0
+        ],
+        [
+          600,
+          1200
+        ],
+        [
+          0,
+          1200
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "hvi",
+      "points": [
+        [
+          1360,
+          0
+        ],
+        [
+          1960,
+          0
+        ],
+        [
+          1960,
+          1200
+        ],
+        [
+          1360,
+          1200
+        ],
+        [
+          1360,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

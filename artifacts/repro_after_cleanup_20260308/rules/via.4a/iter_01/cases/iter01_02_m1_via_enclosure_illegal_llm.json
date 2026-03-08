@@ -1,0 +1,61 @@
+{
+  "case_id": "m1_via_enclosure_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: via.4a\nDescription: via.4a : min. m1 enclosure of 0.15um via : 0.055um\nRunset expression: m1 .edges .enclosing(rectVIA.drc(width == 0.15), 0.055, euclidian)\nExpression refs: m1, rectvia\nUpstream chain: L150:m1_wildcard = \"68/20\" | L151:via_wildcard = \"68/44\" | L195:m1 = polygons(m1_wildcard) | L196:via = polygons(via_wildcard) | L1070:rectvia = via\nRunset context: if BEOL | if backend_flow = AL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          450,
+          300
+        ],
+        [
+          450,
+          450
+        ],
+        [
+          300,
+          450
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "m1",
+      "points": [
+        [
+          260,
+          260
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          480
+        ],
+        [
+          260,
+          480
+        ],
+        [
+          260,
+          260
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

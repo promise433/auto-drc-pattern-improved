@@ -1,0 +1,34 @@
+{
+  "case_id": "hvi_forbidden_angle_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: hvi_angle\nDescription: x.3a : non 45 degree angle hvi\nRunset expression: hvi.with_angle(0..45)\nExpression refs: hvi\nUpstream chain: L179:hvi = polygons(75, 20)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "hvi",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

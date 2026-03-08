@@ -1,0 +1,34 @@
+{
+  "case_id": "m2_offgrid_vertex_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: m2_OFFGRID\nDescription: x.1b : OFFGRID vertex on m2\nRunset expression: m2.ongrid(0.005)\nExpression refs: m2\nUpstream chain: L153:m2_wildcard = \"69/20\" | L198:m2 = polygons(m2_wildcard)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "m2",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

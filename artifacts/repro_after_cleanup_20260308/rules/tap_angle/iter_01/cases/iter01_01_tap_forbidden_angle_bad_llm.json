@@ -1,0 +1,38 @@
+{
+  "case_id": "tap_forbidden_angle_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: tap_angle\nDescription: x.2c : non 45 degree angle tap\nRunset expression: tap .and(areaid_en.and(uhvi)) .with_angle(0..45)\nExpression refs: tap, areaid_en, uhvi\nUpstream chain: L170:tap = polygons(65, 44) | L215:uhvi = polygons(74, 22) | L247:areaid_en = polygons(81, 57)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "tap",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          300,
+          100
+        ],
+        [
+          600,
+          110
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ],
+        [
+          100,
+          100
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

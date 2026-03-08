@@ -1,0 +1,34 @@
+{
+  "case_id": "hvtr_offgrid_vertex_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: hvtr_OFFGRID\nDescription: x.1b : OFFGRID vertex on hvtr\nRunset expression: hvtr.ongrid(0.005)\nExpression refs: hvtr\nUpstream chain: L176:hvtr = polygons(18, 20)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "hvtr",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          201,
+          1
+        ],
+        [
+          201,
+          201
+        ],
+        [
+          1,
+          201
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

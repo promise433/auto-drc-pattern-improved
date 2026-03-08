@@ -1,0 +1,61 @@
+{
+  "case_id": "m2_via_enclosure_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: m2.4_b\nDescription: m2.4_B : min. m2 enclosure of via inside areaid:core : 0.045um\nRunset expression: m2.enclosing(via_inside_periphery, 0.045, euclidian)\nExpression refs: m2, via_inside_periphery\nUpstream chain: L151:via_wildcard = \"68/44\" | L153:m2_wildcard = \"69/20\" | L196:via = polygons(via_wildcard) | L198:m2 = polygons(m2_wildcard) | L225:areaid_ce = polygons(81, 2) | L1136:via_inside_periphery = via.and(areaid_ce)\nRunset context: if BEOL | if backend_flow = AL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          450,
+          300
+        ],
+        [
+          450,
+          450
+        ],
+        [
+          300,
+          450
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "m2",
+      "points": [
+        [
+          260,
+          260
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          480
+        ],
+        [
+          260,
+          480
+        ],
+        [
+          260,
+          260
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

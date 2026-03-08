@@ -1,0 +1,59 @@
+{
+  "case_id": "via4_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: via4.2\nDescription: via4.2 : min. via4 spacing : 0.8um\nRunset expression: via4 .space(0.8, euclidian) .polygons\nExpression refs: via4\nUpstream chain: L160:via4_wildcard = \"71/44\" | L205:via4 = polygons(via4_wildcard)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via4",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          800,
+          0
+        ],
+        [
+          800,
+          1600
+        ],
+        [
+          0,
+          1600
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "via4",
+      "points": [
+        [
+          1660,
+          0
+        ],
+        [
+          2460,
+          0
+        ],
+        [
+          2460,
+          1600
+        ],
+        [
+          1660,
+          1600
+        ],
+        [
+          1660,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

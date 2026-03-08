@@ -1,0 +1,61 @@
+{
+  "case_id": "met5_must_interact_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: m5.x\nDescription: floating met5, must interact with via4\nRunset expression: m5.not_interacting(via4)\nExpression refs: m5, via4\nUpstream chain: L160:via4_wildcard = \"71/44\" | L162:m5_wildcard = \"72/20\" | L205:via4 = polygons(via4_wildcard) | L207:m5 = polygons(m5_wildcard)\nRunset context: if BEOL | if FLOATING_MET [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met5",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          200,
+          0
+        ],
+        [
+          200,
+          200
+        ],
+        [
+          0,
+          200
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "via4",
+      "points": [
+        [
+          260,
+          0
+        ],
+        [
+          290,
+          20
+        ],
+        [
+          290,
+          200
+        ],
+        [
+          260,
+          200
+        ],
+        [
+          260,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

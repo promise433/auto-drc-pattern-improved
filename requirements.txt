@@ -1,0 +1,34 @@
+# ============================================================
+# Auto DRC Pattern - pinned dependencies
+# ============================================================
+#
+# Recommended install flow:
+#   python3 -m venv .venv
+#   source .venv/bin/activate
+#   python -m pip install --upgrade pip setuptools wheel
+#   python -m pip install -r requirements.txt
+#
+# Notes:
+# - This file uses CPU PyTorch by default for portability.
+# - For GPU experiments, replace the three torch packages with the
+#   CUDA build matching your local environment.
+
+--index-url https://pypi.org/simple
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+torch==2.5.1+cpu
+torchvision==0.20.1+cpu
+torchaudio==2.5.1+cpu
+
+transformers==4.46.3
+datasets==3.1.0
+peft==0.13.2
+accelerate==1.1.1
+trl==0.12.1
+sentencepiece==0.2.0
+safetensors==0.4.5
+
+numpy==1.26.4
+pandas==2.2.3
+pyarrow==18.1.0
+scipy==1.14.1

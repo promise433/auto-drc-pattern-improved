@@ -1,0 +1,34 @@
+{
+  "case_id": "li_min_enclosure_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: ct.4\nDescription: ct.4 : mcon should covered by li\nRunset expression: mconnotace.not(li)\nExpression refs: mconnotace, li\nUpstream chain: L146:li_wildcard = \"67/20\" | L148:mcon_wildcard = \"67/44\" | L191:li = polygons(li_wildcard) | L193:mcon = polygons(mcon_wildcard) | L225:areaid_ce = polygons(81, 2) | L936:mconnotace = mcon.not(areaid_ce)\nRunset context: if BEOL [cand=1]",
+  "lpl": [
+    {
+      "layer": "li",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

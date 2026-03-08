@@ -1,0 +1,109 @@
+{
+  "case_id": "mcon_min_width_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: ct.3\nDescription: ct.3 : min. width of ring-shaped mcon : 0.17um\nRunset expression: ringMCON.width(0.17, euclidian)\nExpression refs: ringmcon\nUpstream chain: L148:mcon_wildcard = \"67/44\" | L193:mcon = polygons(mcon_wildcard) | L938:ringmcon = mcon.drc(with_holes > 0)\nRunset context: if BEOL | if SEAL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "mcon",
+      "points": [
+        [
+          0,
+          1610
+        ],
+        [
+          1840,
+          1610
+        ],
+        [
+          1840,
+          1840
+        ],
+        [
+          0,
+          1840
+        ],
+        [
+          0,
+          1610
+        ]
+      ]
+    },
+    {
+      "layer": "mcon",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1840,
+          0
+        ],
+        [
+          1840,
+          230
+        ],
+        [
+          0,
+          230
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "mcon",
+      "points": [
+        [
+          0,
+          230
+        ],
+        [
+          230,
+          230
+        ],
+        [
+          230,
+          1610
+        ],
+        [
+          0,
+          1610
+        ],
+        [
+          0,
+          230
+        ]
+      ]
+    },
+    {
+      "layer": "mcon",
+      "points": [
+        [
+          1610,
+          230
+        ],
+        [
+          1840,
+          230
+        ],
+        [
+          1840,
+          1610
+        ],
+        [
+          1610,
+          1610
+        ],
+        [
+          1610,
+          230
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

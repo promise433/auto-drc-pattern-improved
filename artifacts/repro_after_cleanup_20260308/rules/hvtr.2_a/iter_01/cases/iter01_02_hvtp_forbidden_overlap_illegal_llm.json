@@ -1,0 +1,61 @@
+{
+  "case_id": "hvtp_forbidden_overlap_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: hvtr.2_a\nDescription: hvtr.2_a : hvtr must not overlap hvtp\nRunset expression: hvtr.and(hvtp)\nExpression refs: hvtr, hvtp\nUpstream chain: L176:hvtr = polygons(18, 20) | L177:hvtp = polygons(78, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "hvtp",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          200,
+          0
+        ],
+        [
+          200,
+          200
+        ],
+        [
+          0,
+          200
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "hvtr",
+      "points": [
+        [
+          100,
+          0
+        ],
+        [
+          230,
+          20
+        ],
+        [
+          230,
+          200
+        ],
+        [
+          100,
+          200
+        ],
+        [
+          100,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

@@ -1,0 +1,34 @@
+{
+  "case_id": "m3_min_enclosure_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: capm.3\nDescription: capm.3 : min. m3 enclosure of capm : 0.14um\nRunset expression: m3.enclosing(capm, 0.14, euclidian)\nExpression refs: m3, capm\nUpstream chain: L156:m3_wildcard = \"70/20\" | L201:m3 = polygons(m3_wildcard) | L211:capm = polygons(89, 44)\nRunset context: if FEOL [cand=1]",
+  "lpl": [
+    {
+      "layer": "m3",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

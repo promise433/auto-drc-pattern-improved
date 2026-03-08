@@ -1,0 +1,61 @@
+{
+  "case_id": "m4_min_enclosure_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: cap2m.3_a\nDescription: cap2m.3_a : min. m4 enclosure of cap2m : 0.14um\nRunset expression: m4.enclosing(cap2m, 0.14, euclidian)\nExpression refs: m4, cap2m\nUpstream chain: L159:m4_wildcard = \"71/20\" | L204:m4 = polygons(m4_wildcard) | L212:cap2m = polygons(97, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "cap2m",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          1300,
+          300
+        ],
+        [
+          1300,
+          1300
+        ],
+        [
+          300,
+          1300
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "m4",
+      "points": [
+        [
+          260,
+          260
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          480
+        ],
+        [
+          260,
+          480
+        ],
+        [
+          260,
+          260
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "case_id": "lvtn_min_width_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: lvtn.1a\nDescription: lvtn.1a : min. lvtn width : 0.38um\nRunset expression: log(\"START: 25/44 (lvtn)\") lvtn.width(0.38, euclidian)\nExpression refs: lvtn\nUpstream chain: L181:lvtn = polygons(125, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "lvtn",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          500,
+          20
+        ],
+        [
+          500,
+          80
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

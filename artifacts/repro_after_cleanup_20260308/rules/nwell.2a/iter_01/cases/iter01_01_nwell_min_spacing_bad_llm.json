@@ -1,0 +1,59 @@
+{
+  "case_id": "nwell_min_spacing_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: nwell.2a\nDescription: nwell.2a : min. nwell spacing (merged if less) : 1.27um\nRunset expression: nwell.space(1.27, euclidian)\nExpression refs: nwell\nUpstream chain: L167:nwell_wildcard = \"64/20\" | L171:nwell = polygons(nwell_wildcard)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "nwell",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          840,
+          0
+        ],
+        [
+          840,
+          1680
+        ],
+        [
+          0,
+          1680
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "nwell",
+      "points": [
+        [
+          2050,
+          0
+        ],
+        [
+          2890,
+          0
+        ],
+        [
+          2890,
+          1680
+        ],
+        [
+          2050,
+          1680
+        ],
+        [
+          2050,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

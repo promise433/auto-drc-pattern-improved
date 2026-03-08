@@ -1,0 +1,61 @@
+{
+  "case_id": "capm_via_enclosure_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: capm.4\nDescription: capm.4 : min. capm enclosure of via3 : 0.14um\nRunset expression: capm.enclosing(via3, 0.14, euclidian)\nExpression refs: capm, via3\nUpstream chain: L157:via3_wildcard = \"70/44\" | L202:via3 = polygons(via3_wildcard) | L211:capm = polygons(89, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via3",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          500,
+          300
+        ],
+        [
+          500,
+          500
+        ],
+        [
+          300,
+          500
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "capm",
+      "points": [
+        [
+          260,
+          260
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          480
+        ],
+        [
+          260,
+          480
+        ],
+        [
+          260,
+          260
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

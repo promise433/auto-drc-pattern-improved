@@ -1,0 +1,34 @@
+{
+  "case_id": "dnwell_min_enclosure_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: nwell.6\nDescription: nwell.6 : min enclosure of nwellHole by dnwell : 1.03um\nRunset expression: dnwell.enclosing(nwell_interact.holes, 1.03, euclidian)\nExpression refs: dnwell, nwell_interact\nUpstream chain: L167:nwell_wildcard = \"64/20\" | L172:dnwell = polygons(64, 18) | L299:not_sram = layout(source.cell_obj).select(\"-*sky130_sram_*kbyte_*\") | L302:not_sram_nwell = not_sram.input(nwell_wildcard) | L311:not_io_nwell = not_io.input(nwell_wildcard) | L323:nwell_interact = not_sram_nwell.and(not_io_nwell).merge\nRunset context: if FEOL [cand=1]",
+  "lpl": [
+    {
+      "layer": "dnwell",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

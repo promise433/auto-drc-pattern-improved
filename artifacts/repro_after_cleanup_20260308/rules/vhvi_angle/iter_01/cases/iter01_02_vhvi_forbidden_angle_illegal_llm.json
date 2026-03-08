@@ -1,0 +1,32 @@
+{
+  "case_id": "vhvi_forbidden_angle_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: vhvi_angle\nDescription: x.3a : non 45 degree angle vhvi\nRunset expression: vhvi.with_angle(0..45)\nExpression refs: vhvi\nUpstream chain: L214:vhvi = polygons(74, 21)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "vhvi",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          220,
+          160
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: polygon is not closed"
+  ]
+}

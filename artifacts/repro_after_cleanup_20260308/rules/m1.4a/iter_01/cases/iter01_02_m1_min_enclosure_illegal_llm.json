@@ -1,0 +1,61 @@
+{
+  "case_id": "m1_min_enclosure_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: m1.4a\nDescription: m1.4a : min. m1 enclosure of mcon for specific cells : 0.005um\nRunset expression: in_cell6_m1.enclosing(mcon, 0.005, euclidian)\nExpression refs: in_cell6_m1, mcon\nUpstream chain: L148:mcon_wildcard = \"67/44\" | L150:m1_wildcard = \"68/20\" | L193:mcon = polygons(mcon_wildcard) | L1024:in_cell6_m1 = in_cell6.input(m1_wildcard)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "mcon",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          470,
+          300
+        ],
+        [
+          470,
+          470
+        ],
+        [
+          300,
+          470
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "m1",
+      "points": [
+        [
+          260,
+          260
+        ],
+        [
+          480,
+          290
+        ],
+        [
+          480,
+          480
+        ],
+        [
+          260,
+          480
+        ],
+        [
+          260,
+          260
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

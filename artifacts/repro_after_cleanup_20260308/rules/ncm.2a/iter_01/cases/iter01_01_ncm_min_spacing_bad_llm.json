@@ -1,0 +1,59 @@
+{
+  "case_id": "ncm_min_spacing_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: ncm.2a\nDescription: ncm.2a : min. ncm spacing : 0.38um\nRunset expression: ncm.space(0.38, euclidian)\nExpression refs: ncm\nUpstream chain: L221:ncm = polygons(92, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "ncm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          400
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "ncm",
+      "points": [
+        [
+          400,
+          0
+        ],
+        [
+          480,
+          0
+        ],
+        [
+          480,
+          400
+        ],
+        [
+          400,
+          400
+        ],
+        [
+          400,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

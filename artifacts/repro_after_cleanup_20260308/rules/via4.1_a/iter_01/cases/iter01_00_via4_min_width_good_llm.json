@@ -1,0 +1,34 @@
+{
+  "case_id": "via4_min_width_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: via4.1_a\nDescription: via4.1_a : min. width of via4 outside of moduleCut : 0.8um\nRunset expression: rectVIA4.width(0.8, euclidian)\nExpression refs: rectvia4\nUpstream chain: L160:via4_wildcard = \"71/44\" | L205:via4 = polygons(via4_wildcard) | L1381:rectvia4 = via4\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via4",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          920,
+          0
+        ],
+        [
+          920,
+          860
+        ],
+        [
+          0,
+          860
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

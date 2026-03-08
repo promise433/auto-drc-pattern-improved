@@ -1,0 +1,34 @@
+{
+  "case_id": "via3_min_width_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: via3.1_a\nDescription: via3.1_a : min. width of via3 outside of moduleCut : 0.2um\nRunset expression: via3_not_mt.width(0.2, euclidian)\nExpression refs: via3_not_mt\nUpstream chain: L157:via3_wildcard = \"70/44\" | L202:via3 = polygons(via3_wildcard) | L231:areaid_mt = polygons(81, 10) | L1295:rectvia3 = via3 | L1298:via3_not_mt = rectVIA3.not(areaid_mt)\nRunset context: if BEOL | if backend_flow = AL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via3",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          260
+        ],
+        [
+          0,
+          260
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

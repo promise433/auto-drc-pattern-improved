@@ -1,0 +1,34 @@
+{
+  "case_id": "via3_max_length_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: via3.1_b\nDescription: via3.1_b : maximum length of via3 : 0.2um\nRunset expression: via3_not_mt .edges .without_length(nil, 0.2 + 1.dbu)\nExpression refs: via3_not_mt\nUpstream chain: L157:via3_wildcard = \"70/44\" | L202:via3 = polygons(via3_wildcard) | L231:areaid_mt = polygons(81, 10) | L1295:rectvia3 = via3 | L1298:via3_not_mt = rectVIA3.not(areaid_mt)\nRunset context: if BEOL | if backend_flow = AL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via3",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          260,
+          0
+        ],
+        [
+          260,
+          66
+        ],
+        [
+          0,
+          66
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

@@ -1,0 +1,36 @@
+{
+  "case_id": "met1_width_illegal",
+  "intent": "ILLEGAL",
+  "description": "contains non-manhattan edge to simulate syntax/geometry illegal case",
+  "lpl": [
+    {
+      "layer": "met1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          20
+        ],
+        [
+          400,
+          80
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

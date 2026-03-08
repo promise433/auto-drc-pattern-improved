@@ -1,0 +1,34 @@
+{
+  "case_id": "via2_forbidden_angle_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: via2_angle\nDescription: x.2 : non 90 degree angle via2\nRunset expression: via2.with_angle(0..90)\nExpression refs: via2\nUpstream chain: L154:via2_wildcard = \"69/44\" | L199:via2 = polygons(via2_wildcard)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "via2",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

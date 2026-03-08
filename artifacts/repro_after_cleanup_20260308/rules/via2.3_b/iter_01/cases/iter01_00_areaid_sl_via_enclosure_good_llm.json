@@ -1,0 +1,34 @@
+{
+  "case_id": "areaid_sl_via_enclosure_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: via2.3_b\nDescription: via2.3_b: ring-shaped via2 must be enclosed by areaid_sl\nRunset expression: ringVIA2.not(areaid_sl)\nExpression refs: ringvia2, areaid_sl\nUpstream chain: L154:via2_wildcard = \"69/44\" | L199:via2 = polygons(via2_wildcard) | L224:areaid_sl = polygons(81, 1) | L1194:ringvia2 = via2.drc(with_holes > 0)\nRunset context: if BEOL | if backend_flow = AL | if SEAL [cand=1]",
+  "lpl": [
+    {
+      "layer": "areaid_sl",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

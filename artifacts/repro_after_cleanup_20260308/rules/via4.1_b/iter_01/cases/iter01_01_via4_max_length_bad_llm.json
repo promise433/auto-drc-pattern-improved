@@ -1,0 +1,34 @@
+{
+  "case_id": "via4_max_length_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: via4.1_b\nDescription: via4.1_b : maximum length of via4 : 0.8um\nRunset expression: rectVIA4.drc(length > 0.8)\nExpression refs: rectvia4\nUpstream chain: L160:via4_wildcard = \"71/44\" | L205:via4 = polygons(via4_wildcard) | L1381:rectvia4 = via4\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via4",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          860,
+          0
+        ],
+        [
+          860,
+          266
+        ],
+        [
+          0,
+          266
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

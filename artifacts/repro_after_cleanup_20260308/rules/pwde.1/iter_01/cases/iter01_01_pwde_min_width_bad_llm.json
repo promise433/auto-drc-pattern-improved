@@ -1,0 +1,34 @@
+{
+  "case_id": "pwde_min_width_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: pwde.1\nDescription: pwde.1 : min. pwde width : 0.84um\nRunset expression: log(\"START: 124/20 (pwde)\") pwde.width(0.84, euclidian)\nExpression refs: pwde\nUpstream chain: L174:pwde = polygons(124, 20)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "pwde",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          960,
+          0
+        ],
+        [
+          960,
+          780
+        ],
+        [
+          0,
+          780
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

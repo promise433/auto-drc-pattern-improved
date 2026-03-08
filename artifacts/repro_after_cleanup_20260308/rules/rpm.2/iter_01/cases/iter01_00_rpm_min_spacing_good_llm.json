@@ -1,0 +1,59 @@
+{
+  "case_id": "rpm_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: rpm.2\nDescription: rpm.2 : min. rpm spacing : 0.84um\nRunset expression: rpm.space(0.84, euclidian)\nExpression refs: rpm\nUpstream chain: L186:rpm = polygons(86, 20)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "rpm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1270,
+          0
+        ],
+        [
+          1270,
+          2540
+        ],
+        [
+          0,
+          2540
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "rpm",
+      "points": [
+        [
+          2170,
+          0
+        ],
+        [
+          3440,
+          0
+        ],
+        [
+          3440,
+          2540
+        ],
+        [
+          2170,
+          2540
+        ],
+        [
+          2170,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

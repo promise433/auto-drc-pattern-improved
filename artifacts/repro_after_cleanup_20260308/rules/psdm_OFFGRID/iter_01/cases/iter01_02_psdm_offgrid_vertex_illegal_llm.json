@@ -1,0 +1,36 @@
+{
+  "case_id": "psdm_offgrid_vertex_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: psdm_OFFGRID\nDescription: x.1b : OFFGRID vertex on psdm\nRunset expression: psdm.ongrid(0.005)\nExpression refs: psdm\nUpstream chain: L166:psdm_wildcard = \"94/20\" | L185:psdm = polygons(psdm_wildcard)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "psdm",
+      "points": [
+        [
+          1,
+          1
+        ],
+        [
+          201,
+          21
+        ],
+        [
+          201,
+          201
+        ],
+        [
+          1,
+          201
+        ],
+        [
+          1,
+          1
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

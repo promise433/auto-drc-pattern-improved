@@ -1,0 +1,65 @@
+{
+  "case_id": "tap_min_spacing_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: difftap.3\nDescription: difftap.3 : min. difftap spacing : 0.27um\nRunset expression: log(\"END: 65/44 (tap)\") difftap.space(0.27, euclidian)\nExpression refs: tap, difftap\nUpstream chain: L169:diff = input(65, 20) | L170:tap = polygons(65, 44) | L401:difftap = diff.or(tap)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "tap",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          120,
+          0
+        ],
+        [
+          120,
+          400
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "diff",
+      "points": [
+        [
+          330,
+          0
+        ],
+        [
+          370,
+          30
+        ],
+        [
+          450,
+          30
+        ],
+        [
+          450,
+          400
+        ],
+        [
+          330,
+          400
+        ],
+        [
+          330,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

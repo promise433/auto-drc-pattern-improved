@@ -1,0 +1,59 @@
+{
+  "case_id": "nsm_min_spacing_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: nsm.1\nDescription: nsm.1 : nsm min. spacing : 4.0um\nRunset expression: log(\"START: 61/20 (nsm)\") nsm.space(4.0, euclidian)\nExpression refs: nsm\nUpstream chain: L210:nsm = polygons(61, 20)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "nsm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          80,
+          0
+        ],
+        [
+          80,
+          400
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "nsm",
+      "points": [
+        [
+          4020,
+          0
+        ],
+        [
+          4100,
+          0
+        ],
+        [
+          4100,
+          400
+        ],
+        [
+          4020,
+          400
+        ],
+        [
+          4020,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

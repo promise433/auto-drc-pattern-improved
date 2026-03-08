@@ -1,0 +1,109 @@
+{
+  "case_id": "cap2m_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: cap2m.2b\nDescription: cap2m.2b : min. cap2m spacing : 1.2um\nRunset expression: m4 .interacting(cap2m) .isolated(1.2, euclidian)\nExpression refs: m4, cap2m\nUpstream chain: L159:m4_wildcard = \"71/20\" | L204:m4 = polygons(m4_wildcard) | L212:cap2m = polygons(97, 44)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "m4",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1600,
+          0
+        ],
+        [
+          1600,
+          2600
+        ],
+        [
+          0,
+          2600
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "cap2m",
+      "points": [
+        [
+          300,
+          300
+        ],
+        [
+          1300,
+          300
+        ],
+        [
+          1300,
+          2300
+        ],
+        [
+          300,
+          2300
+        ],
+        [
+          300,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "m4",
+      "points": [
+        [
+          2860,
+          0
+        ],
+        [
+          4460,
+          0
+        ],
+        [
+          4460,
+          2600
+        ],
+        [
+          2860,
+          2600
+        ],
+        [
+          2860,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "cap2m",
+      "points": [
+        [
+          3160,
+          300
+        ],
+        [
+          4160,
+          300
+        ],
+        [
+          4160,
+          2300
+        ],
+        [
+          3160,
+          2300
+        ],
+        [
+          3160,
+          300
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

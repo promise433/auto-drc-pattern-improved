@@ -1,0 +1,38 @@
+{
+  "case_id": "diff_forbidden_angle_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: diff_angle\nDescription: x.2c : non 45 degree angle diff\nRunset expression: diff .and(areaid_en.and(uhvi)) .with_angle(0..45)\nExpression refs: diff, areaid_en, uhvi\nUpstream chain: L169:diff = input(65, 20) | L215:uhvi = polygons(74, 22) | L247:areaid_en = polygons(81, 57)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "diff",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          300,
+          100
+        ],
+        [
+          600,
+          110
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ],
+        [
+          100,
+          100
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

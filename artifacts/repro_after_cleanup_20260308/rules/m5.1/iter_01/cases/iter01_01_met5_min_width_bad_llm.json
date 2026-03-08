@@ -1,0 +1,34 @@
+{
+  "case_id": "met5_min_width_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: m5.1\nDescription: m5.1 : min. m5 width : 1.6um\nRunset expression: log(\"START: 72/20 (m5)\") m5.width(1.6, euclidian)\nExpression refs: m5\nUpstream chain: L162:m5_wildcard = \"72/20\" | L207:m5 = polygons(m5_wildcard)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met5",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1720,
+          0
+        ],
+        [
+          1720,
+          1540
+        ],
+        [
+          0,
+          1540
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

@@ -1,0 +1,34 @@
+{
+  "case_id": "poly_min_width_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: poly.1a\nDescription: poly.1a : min. poly width : 0.15um\nRunset expression: log(\"START: 66/20 (poly)\") poly.width(0.15, euclidian)\nExpression refs: poly\nUpstream chain: L182:poly = polygons(66, 20)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "poly",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          90
+        ],
+        [
+          0,
+          90
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

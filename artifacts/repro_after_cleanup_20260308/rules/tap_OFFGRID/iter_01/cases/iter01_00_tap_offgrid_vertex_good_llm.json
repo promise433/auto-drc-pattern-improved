@@ -1,0 +1,34 @@
+{
+  "case_id": "tap_offgrid_vertex_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: tap_OFFGRID\nDescription: x.1b : OFFGRID vertex on tap\nRunset expression: tap.ongrid(0.005)\nExpression refs: tap\nUpstream chain: L170:tap = polygons(65, 44)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "tap",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

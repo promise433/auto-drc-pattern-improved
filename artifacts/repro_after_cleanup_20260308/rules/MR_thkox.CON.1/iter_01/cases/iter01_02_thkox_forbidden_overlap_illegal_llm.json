@@ -1,0 +1,61 @@
+{
+  "case_id": "thkox_forbidden_overlap_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: MR_thkox.CON.1\nDescription: MR_thkox.CON.1 : thkox must not straddle diff\nRunset expression: thkox .interacting(diff) .not_inside(diff) .edges .and(diff)\nExpression refs: thkox, diff\nUpstream chain: L169:diff = input(65, 20) | L264:thkox = polygons(75, 21)\nRunset context: if FEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "thkox",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          200,
+          0
+        ],
+        [
+          200,
+          200
+        ],
+        [
+          0,
+          200
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "diff",
+      "points": [
+        [
+          100,
+          0
+        ],
+        [
+          230,
+          20
+        ],
+        [
+          230,
+          200
+        ],
+        [
+          100,
+          200
+        ],
+        [
+          100,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[1]: non-manhattan edge at segment 0"
+  ]
+}

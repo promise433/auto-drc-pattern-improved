@@ -1,0 +1,34 @@
+{
+  "case_id": "lvtn_forbidden_angle_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: lvtn_angle\nDescription: x.3a : non 45 degree angle lvtn\nRunset expression: lvtn.with_angle(0..45)\nExpression refs: lvtn\nUpstream chain: L181:lvtn = polygons(125, 44)\nRunset context: if OFFGRID [cand=1]",
+  "lpl": [
+    {
+      "layer": "lvtn",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

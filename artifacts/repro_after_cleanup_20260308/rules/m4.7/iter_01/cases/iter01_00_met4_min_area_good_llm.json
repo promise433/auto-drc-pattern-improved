@@ -1,0 +1,109 @@
+{
+  "case_id": "met4_min_area_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: m4.7\nDescription: m4.7 : min. m4 holes area : 0.2um\u00b2\nRunset expression: m4 .holes .with_area(0..0.2)\nExpression refs: m4\nUpstream chain: L159:m4_wildcard = \"71/20\" | L204:m4 = polygons(m4_wildcard)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met4",
+      "points": [
+        [
+          0,
+          848
+        ],
+        [
+          1148,
+          848
+        ],
+        [
+          1148,
+          1148
+        ],
+        [
+          0,
+          1148
+        ],
+        [
+          0,
+          848
+        ]
+      ]
+    },
+    {
+      "layer": "met4",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          1148,
+          0
+        ],
+        [
+          1148,
+          300
+        ],
+        [
+          0,
+          300
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "met4",
+      "points": [
+        [
+          0,
+          300
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          300,
+          848
+        ],
+        [
+          0,
+          848
+        ],
+        [
+          0,
+          300
+        ]
+      ]
+    },
+    {
+      "layer": "met4",
+      "points": [
+        [
+          848,
+          300
+        ],
+        [
+          1148,
+          300
+        ],
+        [
+          1148,
+          848
+        ],
+        [
+          848,
+          848
+        ],
+        [
+          848,
+          300
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

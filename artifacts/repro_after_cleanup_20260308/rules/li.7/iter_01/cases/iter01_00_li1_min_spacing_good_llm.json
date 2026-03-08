@@ -1,0 +1,59 @@
+{
+  "case_id": "li1_min_spacing_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: li.7\nDescription: li.7 : min. li core spacing : 0.14um\nRunset expression: li_core.space(0.14, euclidian)\nExpression refs: li_core\nUpstream chain: L146:li_wildcard = \"67/20\" | L191:li = polygons(li_wildcard) | L225:areaid_ce = polygons(81, 2) | L915:li_core = li.and(areaid_ce)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "li1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          170,
+          0
+        ],
+        [
+          170,
+          400
+        ],
+        [
+          0,
+          400
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "li1",
+      "points": [
+        [
+          370,
+          0
+        ],
+        [
+          540,
+          0
+        ],
+        [
+          540,
+          400
+        ],
+        [
+          370,
+          400
+        ],
+        [
+          370,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

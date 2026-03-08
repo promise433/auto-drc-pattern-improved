@@ -1,0 +1,36 @@
+{
+  "case_id": "met1_min_area_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: m1.7\nDescription: m1.7 : min. m1 with holes area : 0.14um\u00b2\nRunset expression: m1 .holes .with_area(0..0.14)\nExpression refs: m1\nUpstream chain: L150:m1_wildcard = \"68/20\" | L195:m1 = polygons(m1_wildcard)\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met1",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          738,
+          20
+        ],
+        [
+          738,
+          140
+        ],
+        [
+          0,
+          140
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

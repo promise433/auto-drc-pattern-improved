@@ -1,0 +1,34 @@
+{
+  "case_id": "licon_forbidden_angle_good_llm",
+  "intent": "GOOD",
+  "description": "llm-generated for: Rule ID: licon.1_c\nDescription: licon.1_c : licon should be rectangle\nRunset expression: rectLICON.non_rectangles\nExpression refs: rectlicon\nUpstream chain: L189:licon = polygons(66, 44) | L742:rectlicon = licon\nRunset context: if FEOL [cand=1]",
+  "lpl": [
+    {
+      "layer": "licon",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          400,
+          0
+        ],
+        [
+          400,
+          160
+        ],
+        [
+          0,
+          160
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

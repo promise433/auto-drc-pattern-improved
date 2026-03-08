@@ -1,0 +1,38 @@
+{
+  "case_id": "vpp_forbidden_angle_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: vpp_angle\nDescription: x.3a : non 45 degree angle vpp\nRunset expression: vpp.with_angle(0..45)\nExpression refs: vpp\nUpstream chain: L218:vpp = polygons(82, 64)\nRunset context: if OFFGRID [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "vpp",
+      "points": [
+        [
+          100,
+          100
+        ],
+        [
+          300,
+          100
+        ],
+        [
+          600,
+          110
+        ],
+        [
+          300,
+          300
+        ],
+        [
+          100,
+          300
+        ],
+        [
+          100,
+          100
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

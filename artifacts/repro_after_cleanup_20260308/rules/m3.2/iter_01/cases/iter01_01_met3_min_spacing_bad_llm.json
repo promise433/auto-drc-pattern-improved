@@ -1,0 +1,59 @@
+{
+  "case_id": "met3_min_spacing_bad_llm",
+  "intent": "BAD",
+  "description": "llm-generated for: Rule ID: m3.2\nDescription: m3.2 : min. m3 spacing : 0.3um\nRunset expression: non_huge_m3.space(0.3, euclidian)\nExpression refs: non_huge_m3\nUpstream chain: L156:m3_wildcard = \"70/20\" | L201:m3 = polygons(m3_wildcard) | L1255:huge_m3 = m3.sized(-1.5).sized(1.5).snap(0.005) & m3 | L1256:non_huge_m3 = m3.edges - huge_m3\nRunset context: if BEOL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "met3",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          300,
+          0
+        ],
+        [
+          300,
+          600
+        ],
+        [
+          0,
+          600
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "met3",
+      "points": [
+        [
+          540,
+          0
+        ],
+        [
+          840,
+          0
+        ],
+        [
+          840,
+          600
+        ],
+        [
+          540,
+          600
+        ],
+        [
+          540,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

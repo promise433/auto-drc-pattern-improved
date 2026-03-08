@@ -1,0 +1,36 @@
+{
+  "case_id": "via_min_width_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: via.3\nDescription: via.3 : min. width of ring-shaped via : 0.2um\nRunset expression: ringVIA.width(0.2, euclidian)\nExpression refs: ringvia\nUpstream chain: L151:via_wildcard = \"68/44\" | L196:via = polygons(via_wildcard) | L1067:ringvia = via.drc(with_holes > 0)\nRunset context: if BEOL | if backend_flow = AL | if SEAL [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "via",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          2080,
+          20
+        ],
+        [
+          2080,
+          80
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

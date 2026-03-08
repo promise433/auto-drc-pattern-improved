@@ -1,0 +1,90 @@
+{
+  "case_id": "psdm_min_spacing_illegal_llm",
+  "intent": "ILLEGAL",
+  "description": "llm-generated for: Rule ID: psdm.4\nDescription: psdm.4 : min. spacing across areaid:ce : 0.38um\nRunset expression: psdm.space(0.38, euclidian).polygons.interacting(areaid_ce_merged) psdm_space.interacting( psdm_space.edges.outside_part(areaid_ce_merged) )\nExpression refs: psdm, areaid_ce_merged\nUpstream chain: L166:psdm_wildcard = \"94/20\" | L185:psdm = polygons(psdm_wildcard) | L225:areaid_ce = polygons(81, 2) | L266:areaid_ce_merged = areaid_ce.merged\nRunset context: if FEOL | else [cand=1] [repaired]",
+  "lpl": [
+    {
+      "layer": "psdm",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          380,
+          0
+        ],
+        [
+          380,
+          760
+        ],
+        [
+          0,
+          760
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    },
+    {
+      "layer": "areaid_ce",
+      "points": [
+        [
+          285,
+          200
+        ],
+        [
+          795,
+          200
+        ],
+        [
+          795,
+          580
+        ],
+        [
+          285,
+          580
+        ],
+        [
+          285,
+          200
+        ]
+      ]
+    },
+    {
+      "layer": "psdm",
+      "points": [
+        [
+          700,
+          255
+        ],
+        [
+          740,
+          285
+        ],
+        [
+          1080,
+          285
+        ],
+        [
+          1080,
+          1015
+        ],
+        [
+          700,
+          1015
+        ],
+        [
+          700,
+          255
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[2]: non-manhattan edge at segment 0"
+  ]
+}
