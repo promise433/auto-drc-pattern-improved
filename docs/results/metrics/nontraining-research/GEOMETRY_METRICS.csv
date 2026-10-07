@@ -1,0 +1,11 @@
+source,transform,delta_nm,slots,task_samples,available,good_passed,good_denominator,bad_passed,bad_denominator,illegal_passed,illegal_denominator,effective_pairs,geometry_valid,inputs_ok,target_ok,branch_ok,globally_clean,other_hit_slots,sources
+verified_template_then_rigid_transform,0,10,72,24,72,24,24,24,24,24,24,24,48,48,48,48,16,20,"{""verified_template_then_rigid_transform"": 72}"
+verified_template_then_rigid_transform,1,10,72,24,72,24,24,24,24,24,24,24,48,48,48,48,16,20,"{""verified_template_then_rigid_transform"": 72}"
+verified_template_then_rigid_transform,2,10,72,24,72,24,24,24,24,24,24,24,48,48,48,48,16,20,"{""verified_template_then_rigid_transform"": 72}"
+verified_template_then_rigid_transform,0,20,72,24,72,24,24,24,24,24,24,24,48,48,48,48,16,20,"{""verified_template_then_rigid_transform"": 72}"
+verified_template_then_rigid_transform,1,20,72,24,72,24,24,24,24,24,24,24,48,48,48,48,16,20,"{""verified_template_then_rigid_transform"": 72}"
+verified_template_then_rigid_transform,2,20,72,24,72,24,24,24,24,24,24,24,48,48,48,48,16,20,"{""verified_template_then_rigid_transform"": 72}"
+verified_template_then_rigid_transform,0,30,72,24,72,24,24,24,24,24,24,24,48,48,48,48,17,19,"{""verified_template_then_rigid_transform"": 72}"
+verified_template_then_rigid_transform,1,30,72,24,72,24,24,24,24,24,24,24,48,48,48,48,17,19,"{""verified_template_then_rigid_transform"": 72}"
+verified_template_then_rigid_transform,2,30,72,24,72,24,24,24,24,24,24,24,48,48,48,48,17,19,"{""verified_template_then_rigid_transform"": 72}"
+opposite_intent_challenge,challenge,,96,24,96,0,48,0,48,0,0,0,96,96,0,40,32,40,"{""opposite_intent_challenge"": 96}"

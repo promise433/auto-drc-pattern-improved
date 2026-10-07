@@ -1,0 +1,34 @@
+{
+  "case_id": "dnwell_width_bad",
+  "intent": "BAD",
+  "description": "width 2980nm < min_width 3000nm",
+  "lpl": [
+    {
+      "layer": "dnwell",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          3040,
+          0
+        ],
+        [
+          3040,
+          2980
+        ],
+        [
+          0,
+          2980
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": true,
+  "validation_errors": []
+}

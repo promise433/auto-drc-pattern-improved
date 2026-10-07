@@ -1,0 +1,36 @@
+{
+  "case_id": "nwell_width_illegal",
+  "intent": "ILLEGAL",
+  "description": "contains non-manhattan edge to simulate syntax/geometry illegal case",
+  "lpl": [
+    {
+      "layer": "nwell",
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          660,
+          20
+        ],
+        [
+          660,
+          80
+        ],
+        [
+          0,
+          80
+        ],
+        [
+          0,
+          0
+        ]
+      ]
+    }
+  ],
+  "geometry_valid": false,
+  "validation_errors": [
+    "polygon[0]: non-manhattan edge at segment 0"
+  ]
+}

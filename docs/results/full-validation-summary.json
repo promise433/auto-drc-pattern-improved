@@ -1,0 +1,198 @@
+{
+  "historical_run": "cold_full_validation_20261005_01",
+  "engine": "KLayout 0.30.7",
+  "historical_tests": 279,
+  "new_model_calls_for_export": 0,
+  "new_drc_calls_for_export": 0,
+  "stages": {
+    "sky_template": {
+      "valid_pairs": 278,
+      "fixed_denominator": 279,
+      "generated_pairs": 279,
+      "all_iteration_cases": 837,
+      "legal_cases": 558,
+      "rejected_cases": 279,
+      "final_sources": {
+        "template": 837
+      },
+      "other_hit_cases": 337,
+      "model": {
+        "calls": 0,
+        "returned": 0,
+        "errors": 0
+      },
+      "physical": 558,
+      "physical_seconds": 1197.4990485062008
+    },
+    "ihp_template": {
+      "valid_pairs": 268,
+      "fixed_denominator": 272,
+      "generated_pairs": 269,
+      "all_iteration_cases": 813,
+      "legal_cases": 542,
+      "rejected_cases": 271,
+      "final_sources": {
+        "template": 807
+      },
+      "other_hit_cases": 25,
+      "model": {
+        "calls": 0,
+        "returned": 0,
+        "errors": 0
+      },
+      "physical": 542,
+      "physical_seconds": 1284.8516701941844
+    },
+    "sky_hybrid": {
+      "valid_pairs": 278,
+      "fixed_denominator": 279,
+      "generated_pairs": 279,
+      "all_iteration_cases": 837,
+      "legal_cases": 558,
+      "rejected_cases": 279,
+      "final_sources": {
+        "template_repair": 381,
+        "template_fallback": 443,
+        "model": 13
+      },
+      "other_hit_cases": 337,
+      "model": {
+        "passed": true,
+        "calls": 1953,
+        "returned": 565,
+        "errors": 1388,
+        "strict_parse_ok": 298,
+        "mathematical_geometry_valid": 564,
+        "retained_model_cases": 13,
+        "retained_source_verified": true,
+        "prompts_reconstructed": true,
+        "scope": "all actual raw responses; parsing and geometry only, not unselected raw candidate physical success"
+      },
+      "physical": 558,
+      "physical_seconds": 1043.385819464951
+    },
+    "ihp_hybrid": {
+      "valid_pairs": 268,
+      "fixed_denominator": 272,
+      "generated_pairs": 269,
+      "all_iteration_cases": 813,
+      "legal_cases": 542,
+      "rejected_cases": 271,
+      "final_sources": {
+        "template_repair": 183,
+        "template_fallback": 624
+      },
+      "other_hit_cases": 24,
+      "model": {
+        "passed": true,
+        "calls": 1903,
+        "returned": 253,
+        "errors": 1650,
+        "strict_parse_ok": 0,
+        "mathematical_geometry_valid": 253,
+        "retained_model_cases": 0,
+        "retained_source_verified": true,
+        "prompts_reconstructed": true,
+        "scope": "all actual raw responses; parsing and geometry only, not unselected raw candidate physical success"
+      },
+      "physical": 542,
+      "physical_seconds": 1065.0868390632095
+    },
+    "sky_workflow_template": {
+      "valid_pairs": 16,
+      "fixed_denominator": null,
+      "generated_pairs": 16,
+      "all_iteration_cases": 48,
+      "legal_cases": 32,
+      "rejected_cases": 16,
+      "final_sources": {
+        "template": 48
+      },
+      "other_hit_cases": 28,
+      "model": {
+        "calls": 0,
+        "returned": 0,
+        "errors": 0
+      },
+      "physical": 32,
+      "physical_seconds": 73.88019180600531
+    },
+    "ihp_workflow_template": {
+      "valid_pairs": 9,
+      "fixed_denominator": null,
+      "generated_pairs": 9,
+      "all_iteration_cases": 27,
+      "legal_cases": 18,
+      "rejected_cases": 9,
+      "final_sources": {
+        "template": 27
+      },
+      "other_hit_cases": 1,
+      "model": {
+        "calls": 0,
+        "returned": 0,
+        "errors": 0
+      },
+      "physical": 18,
+      "physical_seconds": 45.94247746495239
+    },
+    "sky_workflow_hybrid": {
+      "valid_pairs": 16,
+      "fixed_denominator": null,
+      "generated_pairs": 16,
+      "all_iteration_cases": 48,
+      "legal_cases": 32,
+      "rejected_cases": 16,
+      "final_sources": {
+        "template": 36,
+        "template_fallback": 1,
+        "template_repair": 10,
+        "model": 1
+      },
+      "other_hit_cases": 29,
+      "model": {
+        "passed": true,
+        "calls": 20,
+        "returned": 14,
+        "errors": 6,
+        "strict_parse_ok": 0,
+        "mathematical_geometry_valid": 14,
+        "retained_model_cases": 1,
+        "retained_source_verified": true,
+        "prompts_reconstructed": true,
+        "scope": "all actual raw responses; parsing and geometry only, not unselected raw candidate physical success"
+      },
+      "physical": 32,
+      "physical_seconds": 56.31844307197025
+    },
+    "ihp_workflow_hybrid": {
+      "valid_pairs": 9,
+      "fixed_denominator": null,
+      "generated_pairs": 9,
+      "all_iteration_cases": 27,
+      "legal_cases": 18,
+      "rejected_cases": 9,
+      "final_sources": {
+        "template": 9,
+        "template_fallback": 13,
+        "template_repair": 5
+      },
+      "other_hit_cases": 1,
+      "model": {
+        "passed": true,
+        "calls": 42,
+        "returned": 7,
+        "errors": 35,
+        "strict_parse_ok": 0,
+        "mathematical_geometry_valid": 7,
+        "retained_model_cases": 0,
+        "retained_source_verified": true,
+        "prompts_reconstructed": true,
+        "scope": "all actual raw responses; parsing and geometry only, not unselected raw candidate physical success"
+      },
+      "physical": 18,
+      "physical_seconds": 35.01733019501262
+    }
+  },
+  "scope": "Derived historical summary; not a new inference or physical validation"
+}
