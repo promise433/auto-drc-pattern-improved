@@ -17,6 +17,7 @@ from autodrc.runset_corpus import parse_runset_outputs, to_pretrain_examples
 from autodrc.specs import KNOWN_TASKS, UNKNOWN_TASKS
 from autodrc.training_recipes import export_recipes
 from autodrc.validation import build_validation_report
+from autodrc.tech import detect_tech_name, require_sky_research
 
 
 def default_runset_path() -> Path:
@@ -46,12 +47,25 @@ def run_full_pipeline(
     llm_trust_remote_code: bool = False,
     llm_load_in_4bit: bool = False,
     llm_repair: bool = True,
+    llm_fallback: bool | None = None,
+    llm_prompt_profile: str = 'legacy',
+    llm_strict_response: bool = False,
 ) -> dict[str, Any]:
-    out_root.mkdir(parents=True, exist_ok=True)
-
     runset = runset_path or default_runset_path()
     if not runset.exists():
         raise FileNotFoundError(f"runset not found: {runset}")
+    if detect_tech_name(runset) == 'ihp_sg13g2':
+        from autodrc.ihp_workflow import run_ihp_workflow
+        result = run_ihp_workflow(runset_path=runset,out_root=out_root,generator=generator,
+            corner_deltas_nm=(10,20,30) if run_corner_mining else (),run_selected_drc=run_known_drc_batch,
+            llm_model=llm_model,llm_max_new_tokens=llm_max_new_tokens,llm_temperature=llm_temperature,
+            llm_top_p=llm_top_p,llm_trust_remote_code=llm_trust_remote_code,
+            llm_load_in_4bit=llm_load_in_4bit,llm_repair=llm_repair,
+            llm_fallback=llm_fallback,llm_prompt_profile=llm_prompt_profile,llm_strict_response=llm_strict_response)
+        (out_root/'pipeline_summary.json').write_text(json.dumps(result,indent=2),encoding='utf-8')
+        return result
+    require_sky_research(detect_tech_name(runset))
+    out_root.mkdir(parents=True, exist_ok=True)
 
     # 1) Rule-to-Runset corpus
     rules = parse_runset_outputs(runset)
@@ -69,6 +83,7 @@ def run_full_pipeline(
                 threshold_nm=task.threshold_nm,
                 out_dir=out_root / "runs" / "known_rules" / task.name,
                 max_iters=3,
+                runset_path=runset,
                 target_categories=list(task.target_categories),
                 generator=generator,
                 rule_text=task.description,
@@ -79,6 +94,8 @@ def run_full_pipeline(
                 llm_trust_remote_code=llm_trust_remote_code,
                 llm_load_in_4bit=llm_load_in_4bit,
                 llm_repair=llm_repair,
+                llm_fallback=llm_fallback,llm_prompt_profile=llm_prompt_profile,
+                llm_strict_response=llm_strict_response,
             )
             known_runs.append(
                 {
@@ -144,6 +161,8 @@ def run_full_pipeline(
         "generator": generator,
         "llm_model": llm_model,
         "llm_repair": llm_repair,
+        "llm_fallback": llm_repair if llm_fallback is None else llm_fallback,
+        "llm_prompt_profile": llm_prompt_profile,"llm_strict_response": llm_strict_response,
         "rules_extracted": len(rules),
         "known_runs": known_runs,
         "instruction_rows": len(instruction_rows),
@@ -164,7 +183,7 @@ def main() -> int:
 
     p = argparse.ArgumentParser(description="Run full Auto DRC research pipeline.")
     p.add_argument("--out-root", default="artifacts/full_pipeline")
-    p.add_argument("--runset", help="Path to sky130A_mr.drc")
+    p.add_argument("--runset", help="Path to a DRC runset")
     p.add_argument("--skip-corner-mining", action="store_true")
     p.add_argument("--skip-known-drc-batch", action="store_true")
     p.add_argument("--generator", choices=["template", "llm"], default="template")
@@ -175,6 +194,9 @@ def main() -> int:
     p.add_argument("--llm-trust-remote-code", action="store_true")
     p.add_argument("--llm-load-in-4bit", action="store_true")
     p.add_argument("--llm-disable-repair", action="store_true")
+    p.add_argument("--llm-fallback",choices=["auto","enabled","disabled"],default="auto")
+    p.add_argument("--llm-prompt-profile",choices=["legacy","compact","chat"],default="legacy")
+    p.add_argument("--llm-strict-response",action="store_true")
     args = p.parse_args()
 
     if args.generator == "llm" and not args.llm_model:
@@ -193,6 +215,8 @@ def main() -> int:
         llm_trust_remote_code=args.llm_trust_remote_code,
         llm_load_in_4bit=args.llm_load_in_4bit,
         llm_repair=not args.llm_disable_repair,
+        llm_fallback={'auto':None,'enabled':True,'disabled':False}[args.llm_fallback],
+        llm_prompt_profile=args.llm_prompt_profile,llm_strict_response=args.llm_strict_response,
     )
     print(json.dumps(summary, indent=2))
     return 0

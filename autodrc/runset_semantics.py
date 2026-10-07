@@ -6,11 +6,7 @@ from pathlib import Path
 import re
 from typing import Any
 
-
-OUTPUT_RE = re.compile(
-    r"""\.output\(\s*"(?P<rule_id>[^"]+)"\s*,\s*"(?P<desc>[^"]+)"\s*\)""",
-    re.DOTALL,
-)
+from autodrc.runset_output_parser import find_output_calls
 _OPEN_BLOCK_RE = re.compile(
     r"^\s*(if|unless|while|until|case|for|begin)\b.*$|^\s*.*\bdo\b\s*(?:\|[^|]*\|)?\s*$",
     re.IGNORECASE,
@@ -18,7 +14,7 @@ _OPEN_BLOCK_RE = re.compile(
 _CLOSE_BLOCK_RE = re.compile(r"^\s*end\b", re.IGNORECASE)
 _BRANCH_RE = re.compile(r"^\s*(elsif|else|when)\b.*$", re.IGNORECASE)
 _ASSIGN_RE = re.compile(
-    r"^\s*(?P<lhs>[$]?[A-Za-z_][A-Za-z0-9_]*)\s*(?P<op>\|\|=|\+=|-=|\*=|/=|%=|=(?!=))\s*(?P<rhs>.+?)\s*$"
+    r"^\s*(?P<lhs>[$]?[A-Za-z_][A-Za-z0-9_]*)\s*(?P<op>\|\|=|\+=|-=|\*=|/=|%=|=(?!=))\s*(?P<rhs>.*?)\s*$"
 )
 _TOKEN_RE = re.compile(r"[$]?[A-Za-z_][A-Za-z0-9_]*")
 _RUBY_KEYWORDS = {
@@ -79,6 +75,7 @@ class RunsetOutputSemantic:
     upstream_vars: tuple[str, ...]
     upstream_assignments: tuple[str, ...]
     unresolved_refs: tuple[str, ...]
+    anonymous_body: str = ""
 
 
 def _strip_full_line_comments(text: str) -> str:
@@ -123,15 +120,37 @@ def _extract_condition_vars(header: str) -> tuple[str, ...]:
 
 def _extract_assignments(cleaned_text: str) -> tuple[list[RunsetAssignment], dict[str, list[RunsetAssignment]], set[str]]:
     assignments: list[RunsetAssignment] = []
-    for lineno, raw_line in enumerate(cleaned_text.splitlines(), start=1):
-        line = _strip_inline_comment(raw_line).strip()
+    lines = [_strip_inline_comment(line).strip() for line in cleaned_text.splitlines()]
+    index = 0
+    while index < len(lines):
+        lineno = index + 1
+        line = lines[index]
+        index += 1
         if not line:
             continue
         m = _ASSIGN_RE.match(line)
         if not m:
             continue
         lhs = m.group("lhs").lstrip("$").lower()
-        rhs = re.sub(r"\s+", " ", m.group("rhs").strip())
+        parts = [m.group("rhs").strip()]
+        while index < len(lines):
+            rhs_so_far = " ".join(parts)
+            unquoted = re.sub(r'''"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*' ''', "", rhs_so_far, flags=re.VERBOSE)
+            balance = sum(unquoted.count(x) - unquoted.count(y) for x, y in (("(", ")"), ("[", "]"), ("{", "}")))
+            pending = not rhs_so_far.strip() or balance > 0 or bool(re.search(r"(?:[|&+*/,-]|\\)\s*$", unquoted))
+            next_line = lines[index]
+            if not pending and not next_line.startswith("."):
+                break
+            if not next_line:
+                index += 1
+                continue
+            if _ASSIGN_RE.match(next_line) or _CLOSE_BLOCK_RE.match(next_line):
+                break
+            parts.append(next_line)
+            index += 1
+        rhs = re.sub(r"\s+", " ", " ".join(parts)).strip()
+        if not rhs:
+            continue
         assignments.append(
             RunsetAssignment(
                 lhs=lhs,
@@ -210,9 +229,9 @@ def _resolve_upstream_dependencies(
             ordered_assignments.append(row)
 
         rhs_refs = _extract_refs(row.rhs, candidate_vars)
+        if row.op != "=" and row.lhs not in rhs_refs:
+            rhs_refs += (row.lhs,)
         for ref in reversed(rhs_refs):
-            if ref == row.lhs:
-                continue
             stack.append((ref, row.line_no))
 
     ordered_assignments.sort(key=lambda item: item.line_no)
@@ -323,44 +342,37 @@ def _scan_structure(
 
 
 def _extract_expression(cleaned_text: str, output_start: int) -> str:
+    prefix = cleaned_text[:output_start]
+    masked = re.sub(r'''"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*' ''',
+                    lambda m: " " * len(m.group()), prefix, flags=re.VERBOSE)
     i = output_start - 1
     depth = 0
-    newline_hits = 0
     start = 0
 
     while i >= 0:
-        ch = cleaned_text[i]
+        ch = masked[i]
         if ch in ")]}":
             depth += 1
         elif ch in "([{":
             depth = max(0, depth - 1)
         elif ch == "\n" and depth == 0:
-            line_start = cleaned_text.rfind("\n", 0, i) + 1
-            prev_line = cleaned_text[line_start:i].strip()
-            if not prev_line and newline_hits >= 1:
+            line_start = masked.rfind("\n", 0, i) + 1
+            prev_line = masked[line_start:i].strip()
+            following = masked[i + 1:].lstrip() or ".output"
+            continues = following.startswith(".") or bool(re.search(r"[|&+*/,-]$", prev_line))
+            if not continues or _ASSIGN_RE.match(prev_line) or re.match(
+                r"^(if|unless|elsif|else|when|end)\b", prev_line, re.IGNORECASE,
+            ):
                 start = i + 1
                 break
-            if prev_line.endswith(";"):
-                start = i + 1
-                break
-            if _ASSIGN_RE.match(prev_line):
-                start = i + 1
-                break
-            if re.match(r"^(if|unless|elsif|else|when|end)\b", prev_line, re.IGNORECASE):
-                start = i + 1
-                break
-            if re.search(r"=\s*$", prev_line):
-                start = i + 1
-                break
-            newline_hits += 1
-            if newline_hits >= 8:
-                start = i + 1
-                break
+        elif ch == ";" and depth == 0:
+            start = i+1
+            break
         i -= 1
 
-    expr = cleaned_text[start:output_start].strip()
+    expr = prefix[start:].strip()
     expr = re.sub(
-        r'(?s)^.*\.output\(\s*"[^"]+"\s*,\s*"[^"]+"\s*\)\s*',
+        r"""(?s)^.*\.output\(\s*(?:"[^"]*"|'[^']*')\s*,\s*(?:"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*')\s*\)\s*""",
         "",
         expr,
     )
@@ -370,27 +382,54 @@ def _extract_expression(cleaned_text: str, output_start: int) -> str:
 def parse_runset_output_semantics(runset_path: Path) -> list[RunsetOutputSemantic]:
     raw = runset_path.read_text(encoding="utf-8", errors="replace")
     cleaned = _strip_full_line_comments(raw)
-    contexts, block_paths, _ = _scan_structure(cleaned)
-    _, assignments_by_var, candidate_vars = _extract_assignments(cleaned)
+    contexts, block_paths, blocks = _scan_structure(cleaned)
+    assignments, assignments_by_var, candidate_vars = _extract_assignments(cleaned)
+    anonymous_blocks = [block for block in blocks if block.header.lstrip().startswith("->")]
+    lines = cleaned.splitlines()
 
     rows: list[RunsetOutputSemantic] = []
-    for m in OUTPUT_RE.finditer(cleaned):
-        line_no = cleaned.count("\n", 0, m.start()) + 1
+    for item in find_output_calls(cleaned):
+        line_no = cleaned.count("\n", 0, item.start) + 1
         context_stack = contexts[line_no] if line_no < len(contexts) else tuple()
         block_path = block_paths[line_no] if line_no < len(block_paths) else tuple()
-        expression = _extract_expression(cleaned, m.start())
+        expression = _extract_expression(cleaned, item.start)
+        anonymous_body = ""
+        scoped_assignments = assignments_by_var
+        scoped_candidates = candidate_vars
+        owner = next((block for block in reversed(anonymous_blocks)
+                      if block.start_line < line_no <= block.end_line), None)
+        if owner is not None:
+            anonymous_body = "\n".join(lines[owner.start_line:owner.end_line - 1])
+            # The complete body remains available even when the last expression
+            # is a branch/loop rather than a single directly provable predicate.
+            if owner.end_line == line_no:
+                expression = _extract_expression(anonymous_body, len(anonymous_body))
+            else:
+                # IHP also outputs each element of an array from inside the
+                # anonymous body. Retain the array, rather than a dangling
+                # `each { |result| result` receiver.
+                expression = re.sub(r"\.each\s*\{\s*\|\s*(\w+)\s*\|\s*\1\s*$", "", expression).strip()
+            if expression == "end":
+                expression = "-> do " + re.sub(r"\s+", " ", anonymous_body).strip() + " end.()"
+            scoped_assignments = {}
+            for assignment in assignments:
+                scope = next((block for block in anonymous_blocks
+                              if block.start_line < assignment.line_no < block.end_line), None)
+                if scope is None or scope.block_id == owner.block_id:
+                    scoped_assignments.setdefault(assignment.lhs, []).append(assignment)
+            scoped_candidates = set(scoped_assignments)
         expression_refs, upstream_vars, upstream_assignments, unresolved_refs = (
             _resolve_upstream_dependencies(
                 expression=expression,
                 output_line=line_no,
-                assignments_by_var=assignments_by_var,
-                candidate_vars=candidate_vars,
+                assignments_by_var=scoped_assignments,
+                candidate_vars=scoped_candidates,
             )
         )
         rows.append(
             RunsetOutputSemantic(
-                rule_id=m.group("rule_id"),
-                description=m.group("desc"),
+                rule_id=item.rule_id,
+                description=item.description,
                 line_no=line_no,
                 source_file=str(runset_path),
                 expression=expression,
@@ -401,6 +440,7 @@ def parse_runset_output_semantics(runset_path: Path) -> list[RunsetOutputSemanti
                 upstream_vars=upstream_vars,
                 upstream_assignments=upstream_assignments,
                 unresolved_refs=unresolved_refs,
+                anonymous_body=anonymous_body,
             )
         )
     return rows
@@ -443,7 +483,7 @@ def main() -> int:
     p = argparse.ArgumentParser(
         description="Extract runset output items with expression and block-context semantics."
     )
-    p.add_argument("--runset", required=True, help="Path to sky130A_mr.drc")
+    p.add_argument("--runset", required=True, help="Path to a DRC runset")
     p.add_argument(
         "--out-jsonl",
         default="artifacts/runset_blocks/outputs_with_context.jsonl",

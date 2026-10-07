@@ -7,6 +7,7 @@ from typing import Iterable
 
 from autodrc.casegen import PatternCase, generate_cases_for_rule
 from autodrc.specs import KNOWN_TASKS, UNKNOWN_TASKS, RuleTask
+from autodrc.tech import require_sky_research
 
 
 def _case_to_row(task: RuleTask, case: PatternCase) -> dict[str, object]:
@@ -32,7 +33,11 @@ def _case_to_row(task: RuleTask, case: PatternCase) -> dict[str, object]:
     }
 
 
-def build_instruction_rows(tasks: Iterable[RuleTask], delta_nm: int = 20) -> list[dict[str, object]]:
+def build_instruction_rows(
+    tasks: Iterable[RuleTask],
+    delta_nm: int = 20,
+    tech_name: str = "sky130",
+) -> list[dict[str, object]]:
     rows: list[dict[str, object]] = []
     for task in tasks:
         cases = generate_cases_for_rule(
@@ -40,6 +45,7 @@ def build_instruction_rows(tasks: Iterable[RuleTask], delta_nm: int = 20) -> lis
             layer=task.layer,
             threshold_nm=task.threshold_nm,
             delta_nm=delta_nm,
+            tech_name=tech_name,
         )
         rows.extend(_case_to_row(task, case) for case in cases)
     return rows
@@ -100,6 +106,7 @@ def main() -> int:
     p = argparse.ArgumentParser(
         description="Build instruction-tuning and feedback-augmentation datasets."
     )
+    p.add_argument("--tech-name", default="sky130")
     p.add_argument(
         "--out-instruction",
         default="data/instruction_tuning/instruction.jsonl",
@@ -118,12 +125,13 @@ def main() -> int:
         help="Include unknown/generalization rules in instruction data",
     )
     args = p.parse_args()
+    require_sky_research(args.tech_name)
 
     tasks: list[RuleTask] = list(KNOWN_TASKS)
     if args.include_unknown:
         tasks.extend(list(UNKNOWN_TASKS))
 
-    instruction_rows = build_instruction_rows(tasks, delta_nm=args.delta_nm)
+    instruction_rows = build_instruction_rows(tasks, delta_nm=args.delta_nm, tech_name=args.tech_name)
     feedback_rows = build_feedback_rows(Path(args.runs_root))
 
     write_jsonl(Path(args.out_instruction), instruction_rows)

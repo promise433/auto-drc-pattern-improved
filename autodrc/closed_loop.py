@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import json
+import os
 from pathlib import Path
 import subprocess
 from typing import Any
@@ -12,9 +13,10 @@ from autodrc.casegen import (
     generate_cases_for_rule,
     write_cases,
 )
-from autodrc.llm_generator import generate_case_with_llm
+from autodrc.llm_generator import LLMResponseError, generate_case_with_llm
 from autodrc.llm_policy import adjust_llm_cases, select_best_llm_case
 from autodrc.rules import ParsedRule, parse_rule_text
+from autodrc.tech import detect_tech_name, layer_map_path_for_runset, normalize_tech_name
 
 
 def _local_name(tag: str) -> str:
@@ -52,8 +54,26 @@ class CmdResult:
 
 
 def run_cmd(cmd: list[str]) -> CmdResult:
-    p = subprocess.run(cmd, check=False, capture_output=True, text=True)
+    extra_env: dict[str, str] = {}
+    extra_ld_library_path = os.environ.get("AUTO_DRC_KLAYOUT_LD_LIBRARY_PATH", "").strip()
+    if extra_ld_library_path:
+        current_ld_library_path = os.environ.get("LD_LIBRARY_PATH", "").strip()
+        if current_ld_library_path:
+            extra_env["LD_LIBRARY_PATH"] = (
+                f"{extra_ld_library_path}:{current_ld_library_path}"
+            )
+        else:
+            extra_env["LD_LIBRARY_PATH"] = extra_ld_library_path
+    env = None
+    if extra_env:
+        env = os.environ.copy()
+        env.update(extra_env)
+    p = subprocess.run(cmd, check=False, capture_output=True, text=True, env=env)
     return CmdResult(returncode=p.returncode, stdout=p.stdout, stderr=p.stderr)
+
+
+def _klayout_bin() -> str:
+    return os.environ.get("AUTO_DRC_KLAYOUT_BIN", "klayout").strip() or "klayout"
 
 
 @dataclass(frozen=True)
@@ -187,6 +207,10 @@ def _generate_cases(
     llm_load_in_4bit: bool,
     llm_debug_dir: Path | None,
     llm_repair: bool,
+    llm_fallback: bool | None = None,
+    llm_prompt_profile: str = 'legacy',
+    llm_strict_response: bool = False,
+    tech_name: str = "sky130",
     llm_good_candidates: int = 1,
     llm_bad_candidates: int = 3,
     llm_illegal_candidates: int = 1,
@@ -199,12 +223,14 @@ def _generate_cases(
             delta_nm=delta_nm,
             layer_b=secondary_layer,
             rule_text=rule_text,
+            tech_name=tech_name,
         )
 
     if generator != "llm":
         raise ValueError(f"Unsupported generator: {generator}")
     if not llm_model:
         raise ValueError("llm_model must be provided when generator='llm'")
+    fallback_enabled = llm_repair if llm_fallback is None else llm_fallback
 
     text = rule_text or _default_rule_text(rule_type, layer, threshold_nm)
     cases: list[PatternCase] = []
@@ -219,15 +245,21 @@ def _generate_cases(
         "BAD": max(1, llm_bad_candidates),
         "ILLEGAL": max(1, llm_illegal_candidates),
     }
+    attempts: list[dict[str, Any]] = []
+    if llm_debug_dir is not None:
+        llm_debug_dir.mkdir(parents=True, exist_ok=True)
     for intent in ("GOOD", "BAD", "ILLEGAL"):
         intent_candidates: list[PatternCase] = []
         errors: list[str] = []
+        response_errors_only = True
         for attempt in range(candidates_by_intent[intent]):
             if attempt == 0:
                 temp = llm_temperature
             else:
                 temp = min(0.95, llm_temperature + 0.12 * attempt)
             try:
+                attempt_record = dict(intent=intent, candidate=attempt + 1, temperature=temp)
+                attempts.append(attempt_record)
                 llm_case = generate_case_with_llm(
                     model_name=llm_model,
                     rule_text=text,
@@ -237,8 +269,12 @@ def _generate_cases(
                     top_p=llm_top_p,
                     trust_remote_code=llm_trust_remote_code,
                     load_in_4bit=llm_load_in_4bit,
-                    debug_dir=llm_debug_dir,
+                    debug_dir=(llm_debug_dir / f"candidate_{intent.lower()}_{attempt + 1:02d}"
+                               if llm_debug_dir is not None else None),
                     expected_layer=layer,
+                    tech_name=tech_name,
+                    prompt_profile=llm_prompt_profile,
+                    strict_response=llm_strict_response,
                 )
                 intent_candidates.append(
                     PatternCase(
@@ -246,12 +282,38 @@ def _generate_cases(
                         intent=intent,
                         description=f"llm-generated for: {text} [cand={attempt + 1}]",
                         polygons=llm_case.polygons,
+                        labels=llm_case.labels,
+                        rigorous_geometry=llm_case.rigorous_geometry,
+                        allow_non_manhattan=llm_case.allow_non_manhattan,
                     )
                 )
+                attempt_record.update(status="returned", case_before_selection=llm_case.to_case_dict())
             except Exception as exc:
+                attempt_record.update(status="error", error_type=type(exc).__name__, error=str(exc))
                 errors.append(str(exc))
+                response_errors_only = response_errors_only and isinstance(exc, LLMResponseError)
                 continue
+            finally:
+                if llm_debug_dir is not None:
+                    (llm_debug_dir / "generation_attempts.json").write_text(
+                        json.dumps(attempts, indent=2), encoding="utf-8")
         if not intent_candidates:
+            if fallback_enabled and response_errors_only:
+                fallback = next(case for case in generate_cases_for_rule(
+                    rule_type=rule_type, layer=layer, layer_b=secondary_layer,
+                    threshold_nm=threshold_nm,
+                    delta_nm=20 if normalize_tech_name(tech_name) == "ihp_sg13g2" else delta_nm,
+                    rule_text=text, tech_name=tech_name,
+                ) if case.intent == intent)
+                cases.append(PatternCase(case_id=f"{layer}_{rule_type}_{intent.lower()}_llm",
+                    intent=intent, description=f"[model-fallback:no-usable-response] {fallback.description}",
+                    polygons=fallback.polygons, allow_non_manhattan=fallback.allow_non_manhattan,
+                    labels=fallback.labels))
+                if llm_debug_dir is not None:
+                    (llm_debug_dir / f"fallback_{intent.lower()}.json").write_text(json.dumps(dict(
+                        intent=intent, source="template", reason="no_usable_model_response",
+                        candidate_errors=errors, case=cases[-1].to_dict()), indent=2), encoding="utf-8")
+                continue
             raise RuntimeError(
                 f"LLM produced no usable candidate for intent={intent}; errors={errors[:3]}"
             )
@@ -263,6 +325,7 @@ def _generate_cases(
             rule=parsed_rule,
             secondary_layer=secondary_layer,
             rule_text=text,
+            tech_name=tech_name,
         )
     return cases
 
@@ -310,6 +373,9 @@ def run_closed_loop(
     llm_trust_remote_code: bool = False,
     llm_load_in_4bit: bool = False,
     llm_repair: bool = True,
+    llm_fallback: bool | None = None,
+    llm_prompt_profile: str = 'legacy',
+    llm_strict_response: bool = False,
     llm_good_candidates: int = 1,
     llm_bad_candidates: int = 3,
     llm_illegal_candidates: int = 1,
@@ -337,13 +403,19 @@ def run_closed_loop(
 
     runset = runset_path or _default_sky130_runset()
     if not runset.exists():
-        raise FileNotFoundError(f"SKY130 runset not found: {runset}")
+        raise FileNotFoundError(f"runset not found: {runset}")
+
+    tech_name = detect_tech_name(runset)
+    if dbu != 0.001:
+        raise ValueError("LPL coordinates are nanometres; closed_loop requires dbu=0.001 um")
+    if tech_name == "ihp_sg13g2" and not target_categories:
+        raise ValueError("IHP requires explicit target_categories from the selected runset")
 
     root = out_dir
     root.mkdir(parents=True, exist_ok=True)
 
     lpl_to_gds_script = _repo_root() / "scripts" / "lpl_to_gds.rb"
-    layer_map_json = _repo_root() / "config" / "layers_sky130.json"
+    layer_map_json = layer_map_path_for_runset(runset)
     target_cats = target_categories if target_categories is not None else _default_target_categories(rule_type, layer)
 
     delta_nm = initial_delta_nm
@@ -378,6 +450,10 @@ def run_closed_loop(
             llm_load_in_4bit=llm_load_in_4bit,
             llm_debug_dir=log_dir if generator == "llm" else None,
             llm_repair=llm_repair,
+            llm_fallback=llm_fallback,
+            llm_prompt_profile=llm_prompt_profile,
+            llm_strict_response=llm_strict_response,
+            tech_name=tech_name,
             llm_good_candidates=iter_good_candidates,
             llm_bad_candidates=iter_bad_candidates,
             llm_illegal_candidates=iter_illegal_candidates,
@@ -420,7 +496,7 @@ def run_closed_loop(
                 continue
 
             lpl_cmd = [
-                "klayout",
+                _klayout_bin(),
                 "-b",
                 "-r",
                 str(lpl_to_gds_script),
@@ -448,7 +524,7 @@ def run_closed_loop(
                 )
 
             drc_cmd = [
-                "klayout",
+                _klayout_bin(),
                 "-b",
                 "-r",
                 str(runset),
@@ -465,6 +541,10 @@ def run_closed_loop(
                 "-rd",
                 f"offgrid={str(offgrid).lower()}",
             ]
+            if tech_name == "ihp_sg13g2":
+                drc_cmd.extend(["-rd", f"topcell={top_cell}", "-rd", f"log={log_dir.resolve() / (case.case_id + '_runset.log')}",
+                                "-rd", "threads=1", "-rd", "run_mode=flat",
+                                "-rd", "fillerRules=true", "-rd", "latchUpRules=true", "-rd", "no_recommended=false"])
             if runset_defines:
                 for key, value in sorted(runset_defines.items()):
                     drc_cmd.extend(["-rd", f"{key}={value}"])
@@ -557,6 +637,9 @@ def run_closed_loop(
             "rule_text": rule_text,
             "llm_model": llm_model,
             "llm_repair": llm_repair,
+            "llm_fallback": llm_repair if llm_fallback is None else llm_fallback,
+            "llm_prompt_profile": llm_prompt_profile,
+            "llm_strict_response": llm_strict_response,
             "llm_good_candidates": iter_good_candidates,
             "llm_bad_candidates": iter_bad_candidates,
             "llm_illegal_candidates": iter_illegal_candidates,
@@ -575,6 +658,12 @@ def run_closed_loop(
             "llm_feedback_actions": llm_actions,
             "cases": [asdict(r) for r in case_results],
         }
+        if generator == "llm":
+            iter_summary["model_calls"] = len(json.loads((log_dir / "generation_attempts.json").read_text()))
+            iter_summary["generation_sources"] = [dict(case_id=case.case_id, intent=case.intent,
+                source=("template_fallback" if "[model-fallback:" in case.description else
+                        "template_repair" if "[repaired]" in case.description else "model"),
+                description=case.description) for case in cases]
         iterations.append(iter_summary)
         (iter_dir / "iteration_summary.json").write_text(
             json.dumps(iter_summary, indent=2), encoding="utf-8"
@@ -598,6 +687,9 @@ def run_closed_loop(
         "rule_text": rule_text,
         "llm_model": llm_model,
         "llm_repair": llm_repair,
+        "llm_fallback": llm_repair if llm_fallback is None else llm_fallback,
+        "llm_prompt_profile": llm_prompt_profile,
+        "llm_strict_response": llm_strict_response,
         "llm_good_candidates": llm_good_candidates,
         "llm_bad_candidates": llm_bad_candidates,
         "llm_illegal_candidates": llm_illegal_candidates,
@@ -609,8 +701,13 @@ def run_closed_loop(
         "delta_step_nm": delta_step_nm,
         "max_iters": max_iters,
         "runset_path": str(runset),
+        "tech_name": tech_name,
+        "layer_map_path": str(layer_map_json),
+        "dbu_um": dbu,
         "iterations": iterations,
     }
+    if generator == "llm":
+        final_summary["model_calls"] = sum(it["model_calls"] for it in iterations)
     (root / "summary.json").write_text(json.dumps(final_summary, indent=2), encoding="utf-8")
     return final_summary
 
@@ -651,6 +748,10 @@ def _arg_parser() -> Any:
         action="store_true",
         help="Disable DRC-feedback-driven candidate boosting between iterations.",
     )
+    p.add_argument('--llm-fallback', choices=['auto','enabled','disabled'], default='auto',
+        help='auto兼容旧行为；enabled/disabled独立控制无响应模板回退')
+    p.add_argument('--llm-prompt-profile', choices=['legacy','compact','chat'], default='legacy')
+    p.add_argument('--llm-strict-response', action='store_true')
     p.add_argument(
         "--llm-candidate-growth",
         type=int,
@@ -667,7 +768,7 @@ def _arg_parser() -> Any:
     p.add_argument("--delta-step-nm", type=int, default=20)
     p.add_argument("--max-iters", type=int, default=3)
     p.add_argument("--out-dir", default="runs/closed_loop")
-    p.add_argument("--runset", help="Path to sky130A_mr.drc")
+    p.add_argument("--runset", help="Path to a DRC runset")
     p.add_argument("--top-cell", default="TOP")
     p.add_argument("--feol", default="true", choices=["true", "false"])
     p.add_argument("--beol", default="true", choices=["true", "false"])
@@ -728,6 +829,9 @@ def main() -> int:
         llm_trust_remote_code=args.llm_trust_remote_code,
         llm_load_in_4bit=args.llm_load_in_4bit,
         llm_repair=not args.llm_disable_repair,
+        llm_fallback={'auto':None,'enabled':True,'disabled':False}[args.llm_fallback],
+        llm_prompt_profile=args.llm_prompt_profile,
+        llm_strict_response=args.llm_strict_response,
         llm_feedback_boost=not args.llm_disable_feedback_boost,
         llm_candidate_growth=args.llm_candidate_growth,
         llm_max_candidates_per_intent=args.llm_max_candidates_per_intent,

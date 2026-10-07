@@ -1,22 +1,35 @@
 from __future__ import annotations
 
 from collections import Counter
+import hashlib
+from importlib import metadata
 import json
+import os
 from pathlib import Path
 import re
+import shutil
+import sys
 from typing import Any
 
-from autodrc.closed_loop import run_closed_loop
+from autodrc.closed_loop import _klayout_bin, run_closed_loop
 from autodrc.runset_corpus import RunsetRule, parse_runset_outputs
 from autodrc.runset_semantics import RunsetOutputSemantic, parse_runset_output_semantics
+from autodrc.tech import detect_tech_name, layer_map_path_for_runset, normalize_tech_name
 
 
-_LAYER_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
+_COMMON_LAYER_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("met1", re.compile(r"\b(?:met1|m1)\b", re.IGNORECASE)),
+    ("metal1", re.compile(r"\bmetal1\b", re.IGNORECASE)),
     ("met2", re.compile(r"\b(?:met2|m2)\b", re.IGNORECASE)),
+    ("metal2", re.compile(r"\bmetal2\b", re.IGNORECASE)),
     ("met3", re.compile(r"\b(?:met3|m3)\b", re.IGNORECASE)),
+    ("metal3", re.compile(r"\bmetal3\b", re.IGNORECASE)),
     ("met4", re.compile(r"\b(?:met4|m4)\b", re.IGNORECASE)),
+    ("metal4", re.compile(r"\bmetal4\b", re.IGNORECASE)),
+    ("metal5_filler", re.compile(r"\bmetal5[:._ ]*filler\b|\bm5fil\b", re.IGNORECASE)),
+    ("metal5_slit", re.compile(r"\bmetal5[:._ ]*slit\b", re.IGNORECASE)),
     ("met5", re.compile(r"\b(?:met5|m5)\b", re.IGNORECASE)),
+    ("metal5", re.compile(r"\bmetal5\b", re.IGNORECASE)),
     ("li1", re.compile(r"\b(?:li1|li)\b", re.IGNORECASE)),
     ("poly", re.compile(r"\bpoly\b", re.IGNORECASE)),
     ("diff", re.compile(r"\bdiff\b", re.IGNORECASE)),
@@ -25,32 +38,76 @@ _LAYER_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("via2", re.compile(r"\bvia2\b", re.IGNORECASE)),
     ("via3", re.compile(r"\bvia3\b", re.IGNORECASE)),
     ("via4", re.compile(r"\bvia4\b", re.IGNORECASE)),
+    ("topvia1", re.compile(r"\btopvia1\b", re.IGNORECASE)),
+    ("topvia2", re.compile(r"\btopvia2\b", re.IGNORECASE)),
     ("mcon", re.compile(r"\bmcon\b", re.IGNORECASE)),
     ("nwell", re.compile(r"\bnwell\b", re.IGNORECASE)),
-    ("dnwell", re.compile(r"\bdnwell\b", re.IGNORECASE)),
-    ("pwde", re.compile(r"\bpwde\b", re.IGNORECASE)),
-    ("nsdm", re.compile(r"\bnsdm\b", re.IGNORECASE)),
-    ("psdm", re.compile(r"\bpsdm\b", re.IGNORECASE)),
-    ("nsm", re.compile(r"\bnsm\b", re.IGNORECASE)),
-    ("npc", re.compile(r"\bnpc\b", re.IGNORECASE)),
-    ("capm", re.compile(r"\bcapm\b", re.IGNORECASE)),
-    ("cap2m", re.compile(r"\bcap2m\b", re.IGNORECASE)),
-    ("rdl", re.compile(r"\brdl\b", re.IGNORECASE)),
-    ("ncm", re.compile(r"\bncm\b", re.IGNORECASE)),
     ("pwell", re.compile(r"\bpwell\b", re.IGNORECASE)),
-    ("licon", re.compile(r"\blicon\b", re.IGNORECASE)),
     ("modulecut", re.compile(r"\bmodulecut\b", re.IGNORECASE)),
     ("areaid_re", re.compile(r"\bareaid(?:[._]re)\b", re.IGNORECASE)),
     ("difftap", re.compile(r"\bdifftap\b", re.IGNORECASE)),
 ]
+_TECH_LAYER_PATTERNS: dict[str, list[tuple[str, re.Pattern[str]]]] = {
+    "sky130": [
+        ("dnwell", re.compile(r"\bdnwell\b", re.IGNORECASE)),
+        ("pwde", re.compile(r"\bpwde\b", re.IGNORECASE)),
+        ("nsdm", re.compile(r"\bnsdm\b", re.IGNORECASE)),
+        ("psdm", re.compile(r"\bpsdm\b", re.IGNORECASE)),
+        ("nsm", re.compile(r"\bnsm\b", re.IGNORECASE)),
+        ("npc", re.compile(r"\bnpc\b", re.IGNORECASE)),
+        ("capm", re.compile(r"\bcapm\b", re.IGNORECASE)),
+        ("cap2m", re.compile(r"\bcap2m\b", re.IGNORECASE)),
+        ("rdl", re.compile(r"\brdl\b", re.IGNORECASE)),
+        ("ncm", re.compile(r"\bncm\b", re.IGNORECASE)),
+        ("licon", re.compile(r"\blicon\b", re.IGNORECASE)),
+    ],
+    "ihp_sg13g2": [
+        ("activ_filler", re.compile(r"\bactiv[:._ ]*filler\b|\bafil\b", re.IGNORECASE)),
+        ("activ", re.compile(r"\bactiv\b|\bact\b", re.IGNORECASE)),
+        ("gatpoly_filler", re.compile(r"\bgatpoly[:._ ]*filler\b|\bgfil\b", re.IGNORECASE)),
+        ("gatpoly", re.compile(r"\bgatpoly\b|\bgat\b", re.IGNORECASE)),
+        ("contbar", re.compile(r"\bcontbar\b|\bcntb\b", re.IGNORECASE)),
+        ("cont", re.compile(r"\bcont\b|\bcnt\b|\bcontact\b", re.IGNORECASE)),
+        ("psd", re.compile(r"\bpsd\b", re.IGNORECASE)),
+        ("nsd", re.compile(r"\bnsd\b", re.IGNORECASE)),
+        ("pwellblock", re.compile(r"\bpwell[:._ ]*block\b|\bpwb\b", re.IGNORECASE)),
+        ("nbulay", re.compile(r"\bnbulay\b|\bnbl\b", re.IGNORECASE)),
+        ("nbulay_block", re.compile(r"\bnbulay[:._ ]*block\b|\bnblb\b", re.IGNORECASE)),
+        ("thickgateox", re.compile(r"\bthickgateox\b|\btgo\b", re.IGNORECASE)),
+        ("salblock", re.compile(r"\bsalblock\b", re.IGNORECASE)),
+        ("digibnd", re.compile(r"\bdigibnd\b", re.IGNORECASE)),
+        ("extblock", re.compile(r"\bextblock\b|\bextb\b", re.IGNORECASE)),
+        ("mim", re.compile(r"\bmim\b", re.IGNORECASE)),
+        ("topmetal1_filler", re.compile(r"\btopmetal1[:._ ]*filler\b|\btm1fil\b", re.IGNORECASE)),
+        ("topmetal1_slit", re.compile(r"\btopmetal1[:._ ]*slit\b|\btm1slt\b", re.IGNORECASE)),
+        ("topmetal1", re.compile(r"\btopmetal1\b|\btm1\b", re.IGNORECASE)),
+        ("topmetal2", re.compile(r"\btopmetal2\b|\btm2\b", re.IGNORECASE)),
+        ("topmetal2_filler", re.compile(r"\btopmetal2[:._ ]*filler\b|\btm2fil\b", re.IGNORECASE)),
+        ("topmetal2_slit", re.compile(r"\btopmetal2[:._ ]*slit\b", re.IGNORECASE)),
+        ("edgeseal", re.compile(r"\bedgeseal\b", re.IGNORECASE)),
+        ("lbe", re.compile(r"\blbe\b", re.IGNORECASE)),
+    ],
+}
 
 _THRESH_UM_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(um|µm)", re.IGNORECASE)
 _THRESH_NM_RE = re.compile(r"(\d+(?:\.\d+)?)\s*nm", re.IGNORECASE)
 _THRESH_AREA_RE = re.compile(r"(\d+(?:\.\d+)?)\s*(?:um\^?2|µm\^?2|um2|µm2|um²|µm²)", re.IGNORECASE)
+_THRESH_AREA_CONTEXT_RE = re.compile(
+    r"(?:um\^?2|µm\^?2|um2|µm2|um²|µm²)\)?\s*=\s*(\d+(?:\.\d+)?)",
+    re.IGNORECASE,
+)
+_MAX_PREFIX_RE = re.compile(r"\bmax(?:imum)?\.?\b", re.IGNORECASE)
+_MIN_PREFIX_RE = re.compile(r"\bmin(?:imum)?\.?\b", re.IGNORECASE)
+_MINMAX_PREFIX_RE = re.compile(
+    r"\bmin(?:imum)?\.?\s*(?:/|and)\s*max(?:imum)?\.?\b|\bmin/max\b",
+    re.IGNORECASE,
+)
 
 _SUPPORTED_RULE_TYPES = {
     "min_width",
+    "min_length",
     "max_width",
+    "max_area",
     "min_spacing",
     "min_area",
     "via_enclosure",
@@ -66,6 +123,7 @@ _SUPPORTED_RULE_TYPES = {
 _RELAXED_RULE_TYPES = {
     "forbidden_angle",
     "forbidden_overlap",
+    "max_area",
     "max_length",
     "max_width",
     "min_enclosure",
@@ -85,28 +143,203 @@ _CONTEXT_LIMITED_HINTS: list[tuple[str, re.Pattern[str]]] = [
 ]
 
 _INTERACT_CONTACT_PRIORITY = ("mcon", "licon", "via4", "via3", "via2", "via")
-_LAYER_TOKEN_ALIASES: dict[str, str] = {
+_COMMON_LAYER_TOKEN_ALIASES: dict[str, str] = {
     "via1": "via",
     "met1": "met1",
+    "metal1": "metal1",
     "met2": "met2",
+    "metal2": "metal2",
     "met3": "met3",
+    "metal3": "metal3",
     "met4": "met4",
+    "metal4": "metal4",
     "met5": "met5",
+    "metal5": "metal5",
     "nwellhole": "nwell",
     "hvnwell": "nwell",
     "poly_licon": "poly",
     "polylicon": "poly",
 }
+_TECH_LAYER_TOKEN_ALIASES: dict[str, dict[str, str]] = {
+    "sky130": {},
+    "ihp_sg13g2": {
+        "act": "activ",
+        "cnt": "cont",
+        "cntb": "contbar",
+        "gat": "gatpoly",
+        "nw": "nwell",
+        "pwb": "pwellblock",
+        "nbl": "nbulay",
+        "nblb": "nbulay_block",
+        "tgo": "thickgateox",
+        "afil": "activ_filler",
+        "gfil": "gatpoly_filler",
+        "tm1": "topmetal1",
+        "tm1fil": "topmetal1_filler",
+        "tm1slt": "topmetal1_slit",
+        "topmetal1": "topmetal1",
+        "topmetal1_filler": "topmetal1_filler",
+        "topmetal1_slit": "topmetal1_slit",
+        "tm2": "topmetal2",
+        "topmetal2": "topmetal2",
+        "topvia1": "topvia1",
+        "topvia2": "topvia2",
+        "extb": "extblock",
+        "extblock": "extblock",
+        "mim": "mim",
+        "lbe": "lbe",
+    },
+}
+_COMMON_PREFIX_MAP: dict[str, str] = {
+    "m1": "met1",
+    "m2": "met2",
+    "m3": "met3",
+    "m4": "met4",
+    "m5": "met5",
+    "nw": "nwell",
+    "poly": "poly",
+    "via": "via",
+    "via2": "via2",
+    "via3": "via3",
+    "via4": "via4",
+}
+_TECH_PREFIX_MAP: dict[str, dict[str, str]] = {
+    "sky130": {
+        "li": "li1",
+        "ct": "mcon",
+        "licon": "licon",
+    },
+    "ihp_sg13g2": {
+        "act": "activ",
+        "cnt": "cont",
+        "cntb": "contbar",
+        "gat": "gatpoly",
+        "pwb": "pwellblock",
+        "nbl": "nbulay",
+        "nblb": "nbulay_block",
+        "tgo": "thickgateox",
+        "afil": "activ_filler",
+        "gfil": "gatpoly_filler",
+        "psd": "psd",
+        "nsd": "nsd",
+        "extb": "extblock",
+        "mim": "mim",
+        "tm1": "topmetal1",
+        "tm1fil": "topmetal1_filler",
+        "tm1slt": "topmetal1_slit",
+        "tm2": "topmetal2",
+        "lbe": "lbe",
+    },
+}
+_IHP_ONLY_LAYERS = {
+    "activ",
+    "activ_filler",
+    "cont",
+    "contbar",
+    "gatpoly",
+    "gatpoly_filler",
+    "psd",
+    "nsd",
+    "nbulay",
+    "nbulay_block",
+    "pwellblock",
+    "thickgateox",
+    "salblock",
+    "digibnd",
+    "extblock",
+    "mim",
+    "topmetal1",
+    "topmetal1_filler",
+    "topmetal1_slit",
+    "topmetal2",
+    "topmetal2_filler",
+    "topmetal2_slit",
+    "topvia1",
+    "topvia2",
+    "edgeseal",
+    "lbe",
+    "trans",
+}
+_SKY130_ONLY_LAYERS = {
+    "diff",
+    "tap",
+    "licon",
+    "mcon",
+    "dnwell",
+    "pwde",
+    "nsdm",
+    "psdm",
+    "nsm",
+    "npc",
+    "capm",
+    "cap2m",
+    "rdl",
+    "ncm",
+    "difftap",
+    "modulecut",
+}
+
+
+def _coverage_tech_name(layer_map: set[str], tech_name: str | None = None) -> str:
+    if tech_name is not None:
+        return normalize_tech_name(tech_name)
+    ihp_score = len(layer_map & _IHP_ONLY_LAYERS)
+    sky_score = len(layer_map & _SKY130_ONLY_LAYERS)
+    return "ihp_sg13g2" if ihp_score > sky_score else "sky130"
+
+
+def _layer_patterns_for_tech(layer_map: set[str], tech_name: str | None = None) -> list[tuple[str, re.Pattern[str]]]:
+    tech = _coverage_tech_name(layer_map, tech_name)
+    return _COMMON_LAYER_PATTERNS + _TECH_LAYER_PATTERNS.get(tech, [])
+
+
+def _layer_token_aliases_for_tech(
+    layer_map: set[str],
+    tech_name: str | None = None,
+) -> dict[str, str]:
+    tech = _coverage_tech_name(layer_map, tech_name)
+    out = dict(_COMMON_LAYER_TOKEN_ALIASES)
+    out.update(_TECH_LAYER_TOKEN_ALIASES.get(tech, {}))
+    return out
+
+
+def _prefix_map_for_tech(layer_map: set[str], tech_name: str | None = None) -> dict[str, str]:
+    tech = _coverage_tech_name(layer_map, tech_name)
+    out = dict(_COMMON_PREFIX_MAP)
+    out.update(_TECH_PREFIX_MAP.get(tech, {}))
+    return out
+
+
+def _default_overlap_pair(layer_map: set[str], tech_name: str | None = None) -> tuple[str, str]:
+    tech = _coverage_tech_name(layer_map, tech_name)
+    if tech == "ihp_sg13g2":
+        primary_candidates = ("activ", "cont", "gatpoly", "met1", "metal1", "mim")
+        secondary_candidates = ("nwell", "pwell", "met1", "metal1", "activ", "cont")
+    else:
+        primary_candidates = ("met1", "diff", "poly", "li1", "mcon")
+        secondary_candidates = ("nwell", "diff", "tap", "poly", "met1")
+
+    primary = next((layer for layer in primary_candidates if layer in layer_map), None)
+    if primary is None:
+        primary = next(iter(sorted(layer_map)), "met1")
+    secondary = next(
+        (layer for layer in secondary_candidates if layer in layer_map and layer != primary),
+        primary,
+    )
+    return (primary, secondary)
 
 
 def _extract_layer_mentions(text: str, layer_map: set[str]) -> list[str]:
     lowered = text.lower()
-    found: list[str] = []
+    hits: list[tuple[int, int, str]] = []
     for layer in sorted(layer_map, key=len, reverse=True):
         layer_pat = re.escape(layer).replace(r"\_", r"(?:[_\.\s:]+)")
-        if re.search(rf"\b{layer_pat}\b", lowered):
-            found.append(layer)
-    return found
+        match = re.search(rf"\b{layer_pat}\b", lowered)
+        if match:
+            hits.append((match.start(), -len(layer), layer))
+    if _coverage_tech_name(layer_map) != "sky130":
+        hits.sort()
+    return [layer for _, _, layer in hits]
 
 
 def _parse_wildcards(runset_path: Path) -> dict[str, tuple[int, int]]:
@@ -145,6 +378,16 @@ def _parse_layer_aliases(runset_path: Path, wildcards: dict[str, tuple[int, int]
             if key in wildcards:
                 out[m4.group(1).lower()] = wildcards[key]
             continue
+        m5 = re.search(r'^(\w+)\s*=\s*source\.polygons\("(\d+)\/(\d+)"\)', stripped)
+        if m5:
+            out[m5.group(1).lower()] = (int(m5.group(2)), int(m5.group(3)))
+            continue
+        m6 = re.search(r"^(\w+)\s*=\s*source\.polygons\((\w+)\)", stripped)
+        if m6:
+            key = m6.group(2).lower()
+            if key in wildcards:
+                out[m6.group(1).lower()] = wildcards[key]
+            continue
     return out
 
 
@@ -153,6 +396,8 @@ def _augment_layer_map_with_aliases(layer_map_path: Path, aliases: dict[str, tup
     changed = False
     for alias, pair in aliases.items():
         if alias in rows:
+            if tuple(rows[alias]) != pair:
+                raise ValueError(f"Layer mapping conflicts with runset: {alias} {rows[alias]} != {pair}")
             continue
         rows[alias] = [pair[0], pair[1]]
         changed = True
@@ -167,10 +412,15 @@ def _load_layer_map(path: Path) -> set[str]:
 
 def infer_rule_type(description: str) -> str | None:
     text = description.lower()
+    has_max = bool(_MAX_PREFIX_RE.search(text))
+    has_min = bool(_MIN_PREFIX_RE.search(text))
+    has_minmax = bool(_MINMAX_PREFIX_RE.search(text))
     if "for skywater use only" in text or "use of" in text and "prohibited" in text:
         return "forbidden_use"
     if "offgrid" in text or "off-grid" in text:
         return "offgrid_vertex"
+    if ("angle" in text or "angles" in text) and ("not allowed" in text or "not permitted" in text):
+        return "forbidden_angle"
     if "should be rectangle" in text or "should be rectangular" in text:
         return "forbidden_angle"
     if "must interact with" in text:
@@ -182,26 +432,40 @@ def infer_rule_type(description: str) -> str | None:
         or "must not straddle" in text
         or "can't overlap" in text
         or "may not overlap" in text
-        or " overlaps " in text
+        or " overlaps " in f" {text} "
         or "prohibited" in text
+        or ("not allowed" in text and (" on " in f" {text} " or " over " in f" {text} "))
     ):
         return "forbidden_overlap"
-    if "maximum length" in text or ("min/max" in text and "length" in text):
+    if "length" in text and (has_minmax or "length !=" in text):
         return "max_length"
-    if "maximum width" in text or "max. width" in text or "max width" in text:
+    if "length" in text and has_max:
+        return "max_length"
+    if "length" in text and has_min:
+        return "min_length"
+    if "width" in text and has_max:
         return "max_width"
+    if "area" in text and has_max:
+        return "max_area"
     if (
         "must be enclosed by" in text
         or "enclosure of" in text
         or "covered by" in text
+        or "must be covered with" in text
+        or "must be within" in text
+        or "must be over" in text
+        or "must enclose" in text
         or "enclose all" in text
+        or "extension over" in text
+        or "overlap of" in text
+        or ("extension" in text and has_min)
     ):
         if "via" in text:
             return "via_enclosure"
         return "min_enclosure"
     if "enclosure" in text and "via" in text:
         return "via_enclosure"
-    if "spacing" in text:
+    if "spacing" in text or " space " in f" {text} " or "space:" in text or "space or notch" in text:
         return "min_spacing"
     if "width" in text:
         return "min_width"
@@ -215,20 +479,85 @@ def _canonical_layer_name(layer: str) -> str:
     alias_map = {
         "m1": "m1",
         "met1": "m1",
+        "metal1": "m1",
         "m2": "m2",
         "met2": "m2",
+        "metal2": "m2",
         "m3": "m3",
         "met3": "m3",
+        "metal3": "m3",
         "m4": "m4",
         "met4": "m4",
+        "metal4": "m4",
         "m5": "m5",
         "met5": "m5",
+        "metal5": "m5",
         "li": "li1",
         "li1": "li1",
+        "activ": "activ",
+        "cont": "cont",
+        "contbar": "contbar",
+        "gatpoly": "gatpoly",
         "via1": "via",
         "via": "via",
+        "topmetal1": "topmetal1",
+        "topmetal2": "topmetal2",
+        "topvia1": "topvia1",
+        "topvia2": "topvia2",
     }
     return alias_map.get(low, low)
+
+
+def _layer_specificity(layer: str) -> int:
+    low = layer.lower()
+    score = len(low)
+    if low.endswith("_block"):
+        score += 40
+    if low.endswith("_filler") or low.endswith("_slit"):
+        score += 35
+    if low.endswith("_pin"):
+        score += 15
+    if low.startswith("topmetal") or low.startswith("topvia"):
+        score += 25
+    if low in {
+        "contbar",
+        "nbulay",
+        "nbulay_block",
+        "pwellblock",
+        "thickgateox",
+        "salblock",
+        "extblock",
+        "topmetal1",
+        "topmetal1_filler",
+        "topmetal1_slit",
+        "topmetal2",
+        "topmetal2_filler",
+        "topmetal2_slit",
+        "topvia1",
+        "topvia2",
+        "trans",
+    }:
+        score += 50
+    if low in {
+        "activ",
+        "cont",
+        "gatpoly",
+        "mim",
+        "nwell",
+        "pwell",
+        "metal1",
+        "metal2",
+        "metal3",
+        "metal4",
+        "metal5",
+        "met1",
+        "met2",
+        "met3",
+        "met4",
+        "met5",
+    }:
+        score -= 10
+    return score
 
 
 def _resolve_semantic_layer_token(token: str, layer_map: set[str]) -> str | None:
@@ -279,11 +608,59 @@ def _semantic_primary_layer(
         return None
 
     prefix = rule.rule_id.split(".")[0].lower()
+    resolved_prefix = _resolve_layer_token(prefix, layer_map)
     for candidate in candidates:
         cand_low = candidate.lower()
         if cand_low == prefix or cand_low.endswith(f"_{prefix}"):
             return candidate
+        if (
+            resolved_prefix is not None
+            and _canonical_layer_name(candidate) == _canonical_layer_name(resolved_prefix)
+        ):
+            return candidate
     return candidates[0]
+
+
+def _infer_text_layer(rule: RunsetRule, layer_map: set[str]) -> str | None:
+    prefix = rule.rule_id.split(".")[0].lower()
+    text = f"{rule.rule_id} {rule.description}".lower()
+
+    pattern_hits: list[tuple[int, int, str]] = []
+    for layer, pattern in _layer_patterns_for_tech(layer_map):
+        if layer not in layer_map:
+            continue
+        match = pattern.search(text)
+        if match is None:
+            continue
+        pattern_hits.append((_layer_specificity(layer), -match.start(), layer))
+    if pattern_hits:
+        return max(pattern_hits)[2]
+
+    mentions = _extract_layer_mentions(text, layer_map)
+    if mentions:
+        return mentions[0]
+
+    if prefix == "difftap":
+        if "difftap" in layer_map:
+            return "difftap"
+        if "diff" in layer_map:
+            return "diff"
+    if prefix == "modulecut":
+        if "areaid_mt" in layer_map:
+            return "areaid_mt"
+        if "modulecut" in layer_map:
+            return "modulecut"
+    if prefix.startswith("areaid_re") and "areaid_re" in layer_map:
+        return "areaid_re"
+
+    prefix_map = _prefix_map_for_tech(layer_map)
+    if prefix == "cntb" and "contbar" not in layer_map:
+        prefix_map = dict(prefix_map)
+        prefix_map.pop("cntb", None)
+    mapped = prefix_map.get(prefix)
+    if mapped in layer_map:
+        return mapped
+    return None
 
 
 def infer_layer(
@@ -303,7 +680,31 @@ def infer_layer(
 
     hint = (rule.layer_hint or "").lower()
     hint_layer = hint if hint and hint != "unknown" and hint in layer_map else None
+    prefix_layer = _resolve_layer_token(rule.rule_id.split(".")[0].lower(), layer_map)
+    focused_text_layer = _focused_text_layer(rule, layer_map, rule_type)
+    text_layer = _infer_text_layer(rule, layer_map)
+
+    if focused_text_layer is not None:
+        if semantic_layer is not None and prefix_layer is not None and (
+            _canonical_layer_name(prefix_layer) == _canonical_layer_name(semantic_layer)
+        ):
+            if hint_layer is not None and (
+                _canonical_layer_name(semantic_layer) == _canonical_layer_name(hint_layer)
+            ):
+                return hint_layer
+            return semantic_layer
+        if hint_layer is not None and (
+            _canonical_layer_name(focused_text_layer) == _canonical_layer_name(hint_layer)
+        ):
+            return hint_layer
+        return focused_text_layer
+
     if semantic_layer is not None:
+        if (
+            text_layer is not None
+            and _layer_specificity(text_layer) >= _layer_specificity(semantic_layer) + 30
+        ):
+            return text_layer
         if hint_layer is None:
             return semantic_layer
         if _canonical_layer_name(semantic_layer) == _canonical_layer_name(hint_layer):
@@ -312,60 +713,24 @@ def infer_layer(
 
     if hint and hint != "unknown" and hint in layer_map:
         return hint
-
-    prefix = rule.rule_id.split(".")[0].lower()
-    if prefix in {"capm", "cap2m"} and prefix in layer_map:
-        return prefix
-
-    text = f"{rule.rule_id} {rule.description}".lower()
-    for layer, pattern in _LAYER_PATTERNS:
-        if layer in layer_map and pattern.search(text):
-            return layer
-
-    mentions = _extract_layer_mentions(text, layer_map)
-    if mentions:
-        return mentions[0]
-
-    if prefix == "difftap":
-        if "difftap" in layer_map:
-            return "difftap"
-        if "diff" in layer_map:
-            return "diff"
-    if prefix == "modulecut":
-        if "areaid_mt" in layer_map:
-            return "areaid_mt"
-        if "modulecut" in layer_map:
-            return "modulecut"
-    if prefix.startswith("areaid_re") and "areaid_re" in layer_map:
-        return "areaid_re"
-    prefix_map = {
-        "m1": "met1",
-        "m2": "met2",
-        "m3": "met3",
-        "m4": "met4",
-        "m5": "met5",
-        "li": "li1",
-        "poly": "poly",
-        "ct": "mcon",
-        "via": "via",
-        "via2": "via2",
-        "via3": "via3",
-        "via4": "via4",
-        "licon": "licon",
-    }
-    mapped = prefix_map.get(prefix)
-    if mapped in layer_map:
-        return mapped
-    return None
+    return text_layer
 
 
 def infer_threshold(rule_type: str, description: str) -> int | None:
     text = description.lower()
-    if rule_type == "min_area":
+    if rule_type in {"min_area", "max_area"}:
         matches = _THRESH_AREA_RE.findall(text)
-        if not matches:
+        if matches:
+            value = float(matches[-1])
+            return int(round(value * 1_000_000))
+        match = _THRESH_AREA_CONTEXT_RE.search(text)
+        if match is not None:
+            value = float(match.group(1))
+            return int(round(value * 1_000_000))
+        inline = re.findall(r"=\s*(\d+(?:\.\d+)?)\b", text)
+        if not inline:
             return None
-        value = float(matches[-1])
+        value = float(inline[-1])
         return int(round(value * 1_000_000))
 
     nm_matches = _THRESH_NM_RE.findall(text)
@@ -375,9 +740,12 @@ def infer_threshold(rule_type: str, description: str) -> int | None:
 
     um_matches = _THRESH_UM_RE.findall(text)
     if not um_matches:
-        return None
-
-    value = float(um_matches[-1][0])
+        inline = re.search(r"=\s*(\d+(?:\.\d+)?)\b", text)
+        if not inline or _THRESH_AREA_RE.search(text):
+            return None
+        value = float(inline.group(1))
+    else:
+        value = float(um_matches[-1][0])
     return int(round(value * 1000))
 
 
@@ -391,7 +759,7 @@ def _overlap_pair_from_text(text: str, layer_map: set[str]) -> tuple[str, str]:
         return unique_tokens[0], unique_tokens[1]
 
     found: list[str] = []
-    for layer, pattern in _LAYER_PATTERNS:
+    for layer, pattern in _layer_patterns_for_tech(layer_map):
         if layer in layer_map and pattern.search(text):
             found.append(layer)
     unique = []
@@ -401,12 +769,13 @@ def _overlap_pair_from_text(text: str, layer_map: set[str]) -> tuple[str, str]:
     if len(unique) >= 2:
         return unique[0], unique[1]
     if len(unique) == 1:
-        if unique[0] != "nwell" and "nwell" in layer_map:
-            return unique[0], "nwell"
-        if unique[0] != "diff" and "diff" in layer_map:
-            return unique[0], "diff"
+        primary, secondary = _default_overlap_pair(layer_map)
+        if unique[0] != primary and primary in layer_map:
+            return unique[0], primary
+        if unique[0] != secondary and secondary in layer_map:
+            return unique[0], secondary
         return unique[0], unique[0]
-    return "met1", "nwell" if "nwell" in layer_map else "diff"
+    return _default_overlap_pair(layer_map)
 
 
 def _interact_pair_from_text(rule: RunsetRule, layer_map: set[str]) -> tuple[str, str] | None:
@@ -474,7 +843,7 @@ def _resolve_layer_token(token: str, layer_map: set[str]) -> str | None:
     compact = re.sub(r"[^a-z0-9_]+", "", low)
     if compact in layer_map:
         return compact
-    mapped = _LAYER_TOKEN_ALIASES.get(compact)
+    mapped = _layer_token_aliases_for_tech(layer_map).get(compact)
     if mapped and mapped in layer_map:
         return mapped
     return None
@@ -507,14 +876,100 @@ def _resolve_layer_phrase(phrase: str, layer_map: set[str]) -> str | None:
     return None
 
 
+def _resolve_primary_layer_phrase(phrase: str, layer_map: set[str]) -> str | None:
+    low = phrase.lower().strip()
+    if not low:
+        return None
+
+    direct = _resolve_layer_token(low, layer_map)
+    if direct:
+        return direct
+
+    underscored = re.sub(r"[^a-z0-9]+", "_", low).strip("_")
+    if underscored in layer_map:
+        return underscored
+
+    compact = re.sub(r"[^a-z0-9]+", "", low)
+    if compact in layer_map:
+        return compact
+
+    mentions = _extract_layer_mentions(low, layer_map)
+    unique_mentions: list[str] = []
+    for mention in mentions:
+        if mention not in unique_mentions:
+            unique_mentions.append(mention)
+    if len(unique_mentions) == 1:
+        return unique_mentions[0]
+    if len(unique_mentions) > 1:
+        return None
+
+    pattern_hits: list[str] = []
+    for layer, pattern in _layer_patterns_for_tech(layer_map):
+        if layer not in layer_map:
+            continue
+        if pattern.search(low):
+            pattern_hits.append(layer)
+    unique_hits: list[str] = []
+    for hit in pattern_hits:
+        if hit not in unique_hits:
+            unique_hits.append(hit)
+    if len(unique_hits) == 1:
+        return unique_hits[0]
+    return None
+
+
+def _focused_text_layer(
+    rule: RunsetRule,
+    layer_map: set[str],
+    rule_type: str | None,
+) -> str | None:
+    if rule_type not in {
+        "min_width",
+        "max_width",
+        "min_length",
+        "max_length",
+        "min_area",
+        "max_area",
+        "min_spacing",
+    }:
+        return None
+
+    description = re.sub(r"^\s*[a-z0-9_.-]+\s*:\s*", "", rule.description.lower()).strip()
+    keyword_map = {
+        "min_width": "width",
+        "max_width": "width",
+        "min_length": "length",
+        "max_length": "length",
+        "min_area": "area",
+        "max_area": "area",
+        "min_spacing": "space",
+    }
+    keyword = keyword_map.get(rule_type)
+    if not keyword:
+        return None
+
+    match = re.search(rf"\b{keyword}\b", description)
+    if match is None:
+        return None
+
+    prefix = description[: match.start()]
+    prefix = re.sub(r"^\s*(?:min(?:imum)?|max(?:imum)?)(?:\.)?\s*", "", prefix).strip(" :-")
+    prefix = re.sub(r"\b(?:minimum|maximum|min|max)\b.*$", "", prefix).strip(" :-")
+    if not prefix:
+        return None
+    return _resolve_primary_layer_phrase(prefix, layer_map)
+
+
 def _enclosure_pair_from_text(text: str, layer_map: set[str]) -> tuple[str, str] | None:
     t = text.lower()
     t = re.sub(r"^\s*[a-z0-9_.-]+\s*:\s*", "", t)
+    phrase = r"[a-z0-9_:+\- ]+?"
+    final_phrase = r"[a-z0-9_:+\- ]+"
 
     patterns: list[tuple[re.Pattern[str], str, str]] = [
         (
             re.compile(
-                r"\b(?P<inner>[a-z0-9_]+)\b.*\b(?:must be enclosed by|enclosed by|covered by)\b\s*(?P<outer>[a-z0-9_ ]+)",
+                rf"\b(?P<inner>{phrase})\b.*\b(?:must be enclosed by|enclosed by|covered by|must be covered with|must be within|must be over)\b\s*(?P<outer>{final_phrase})",
                 re.IGNORECASE,
             ),
             "inner",
@@ -522,7 +977,7 @@ def _enclosure_pair_from_text(text: str, layer_map: set[str]) -> tuple[str, str]
         ),
         (
             re.compile(
-                r"\benclosure of\s+(?P<inner>[a-z0-9_]+)\s+by\s+(?P<outer>[a-z0-9_ ]+)",
+                rf"\benclosure of\s+(?P<inner>{phrase})\s+by\s+(?P<outer>{final_phrase})",
                 re.IGNORECASE,
             ),
             "inner",
@@ -530,7 +985,7 @@ def _enclosure_pair_from_text(text: str, layer_map: set[str]) -> tuple[str, str]
         ),
         (
             re.compile(
-                r"\b(?P<outer>[a-z0-9_]+)\s+enclosure of\s+(?P<inner>[a-z0-9_]+)",
+                rf"\b(?P<outer>{phrase})\s+enclosure of\s+(?P<inner>{final_phrase})",
                 re.IGNORECASE,
             ),
             "inner",
@@ -538,7 +993,23 @@ def _enclosure_pair_from_text(text: str, layer_map: set[str]) -> tuple[str, str]
         ),
         (
             re.compile(
-                r"\b(?P<outer>[a-z0-9_]+)\b.*\benclose all\b.*\b(?P<inner>[a-z0-9_]+)\b",
+                rf"\b(?P<outer>{phrase})\b.*\b(?:must enclose(?: all)?|enclose all)\b.*\b(?P<inner>{final_phrase})\b",
+                re.IGNORECASE,
+            ),
+            "inner",
+            "outer",
+        ),
+        (
+            re.compile(
+                rf"\b(?P<outer>{phrase})\s+extension over\s+(?P<inner>{final_phrase})",
+                re.IGNORECASE,
+            ),
+            "inner",
+            "outer",
+        ),
+        (
+            re.compile(
+                rf"\b(?P<outer>{phrase})\s+overlap of\s+(?P<inner>{final_phrase})",
                 re.IGNORECASE,
             ),
             "inner",
@@ -564,10 +1035,16 @@ def _enclosure_pair_from_text(text: str, layer_map: set[str]) -> tuple[str, str]
         if layer not in uniq:
             uniq.append(layer)
     if len(uniq) >= 2:
-        if "enclosure of" in t or "enclose all" in t:
+        if "enclosure of" in t:
+            if " by " in f" {t} ":
+                return (uniq[0], uniq[1])
             return (uniq[1], uniq[0])
-        if "enclosed by" in t or "covered by" in t:
+        if "enclose all" in t or "must enclose" in t:
+            return (uniq[1], uniq[0])
+        if "enclosed by" in t or "covered by" in t or "must be covered with" in t or "must be within" in t:
             return (uniq[0], uniq[1])
+        if "extension over" in t or "overlap of" in t:
+            return (uniq[1], uniq[0])
         return (uniq[0], uniq[1])
     return None
 
@@ -581,7 +1058,6 @@ def _enclosure_pair_from_semantic(
     if semantic is None or not semantic.expression:
         return None
 
-    expr = semantic.expression.lower()
     patterns: list[tuple[re.Pattern[str], str, str]] = []
     if rule_type == "via_enclosure":
         patterns.append(
@@ -598,14 +1074,24 @@ def _enclosure_pair_from_semantic(
             "outer",
         )
     )
-    for pattern, inner_name, outer_name in patterns:
-        match = pattern.search(expr)
-        if not match:
-            continue
-        inner = _resolve_semantic_layer_token(match.group(inner_name), layer_map)
-        outer = _resolve_semantic_layer_token(match.group(outer_name), layer_map)
-        if inner and outer:
-            return (inner, outer)
+    patterns.append(
+        (
+            re.compile(r"\b(?P<inner>[a-z0-9_]+)\s*\.ext_enclosed\(\s*(?P<outer>[a-z0-9_]+)\b"),
+            "inner",
+            "outer",
+        )
+    )
+    semantic_texts = [semantic.expression, *reversed(semantic.upstream_assignments)]
+    for raw_text in semantic_texts:
+        expr = raw_text.lower()
+        for pattern, inner_name, outer_name in patterns:
+            match = pattern.search(expr)
+            if not match:
+                continue
+            inner = _resolve_semantic_layer_token(match.group(inner_name), layer_map)
+            outer = _resolve_semantic_layer_token(match.group(outer_name), layer_map)
+            if inner and outer:
+                return (inner, outer)
     return None
 
 
@@ -624,6 +1110,21 @@ def classify_rule(
     semantic: RunsetOutputSemantic | None = None,
 ) -> dict[str, Any]:
     rule_type = infer_rule_type(rule.description)
+    if semantic is not None and _coverage_tech_name(layer_map) == "ihp_sg13g2":
+        from autodrc.ihp_contracts import compile_contract
+        contract = compile_contract(semantic.expression, semantic.upstream_assignments, layer_map, rule_type)
+        if contract is not None:
+            if contract.get('official_limitation'):
+                return dict(supported=False,reason='official_empty_executed_interval',
+                            rule_type=contract['rule_type'],ihp_contract=contract,
+                            official_limitation=contract['official_limitation'])
+            layers = contract['operand_layers']
+            kind = contract['rule_type']
+            paired = contract['operation'] in {'ext_enclosed', 'ext_not', 'endcap'}
+            return dict(supported=True, rule_type='min_enclosure' if kind == 'coverage' else kind,
+                        layer=layers[1] if paired else layers[0],
+                        **({'layer_b': layers[0] if paired else layers[1]} if len(layers) == 2 else {}),
+                        threshold_nm=max(1, contract['threshold_nm']), ihp_contract=contract)
     if rule_type is None:
         return {"supported": False, "reason": "unsupported_rule_type", "rule_type": None}
 
@@ -631,7 +1132,10 @@ def classify_rule(
         return {"supported": False, "reason": "unsupported_rule_type", "rule_type": rule_type}
 
     if rule_type == "forbidden_use":
-        layer = infer_layer(rule, layer_map, semantic=semantic, rule_type=rule_type)
+        receiver = semantic.expression.strip() if semantic else ""
+        layer = (_resolve_semantic_layer_token(receiver, layer_map)
+                 if re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", receiver) else None)
+        layer = layer or infer_layer(rule, layer_map, semantic=semantic, rule_type=rule_type)
         if layer is None:
             return {
                 "supported": False,
@@ -699,6 +1203,16 @@ def classify_rule(
         threshold = infer_threshold(rule_type, rule.description)
         if threshold is None:
             threshold = 60
+        elif threshold == 0:
+            threshold = 1
+        elif threshold < 0:
+            return {
+                "supported": False,
+                "reason": "invalid_threshold",
+                "rule_type": rule_type,
+                "layer": outer_layer,
+                "threshold_nm": threshold,
+            }
 
         return {
             "supported": True,
@@ -734,7 +1248,10 @@ def classify_rule(
                     "layer": layer,
                 }
 
-    if threshold <= 0:
+    if threshold == 0:
+        threshold = 1
+
+    if threshold < 0:
         return {
             "supported": False,
             "reason": "invalid_threshold",
@@ -781,6 +1298,16 @@ def _compose_runset_rule_text(rule: RunsetRule, semantic: RunsetOutputSemantic |
     ]
     if semantic is not None and semantic.expression:
         parts.append(f"Runset expression: {semantic.expression}")
+    if semantic is not None and semantic.anonymous_body:
+        parts.append("Anonymous body: " + re.sub(r"\s+", " ", semantic.anonymous_body).strip())
+    if semantic is not None and semantic.anonymous_body:
+        from autodrc.ihp_contracts import compile_contract
+        # The runtime config is the IHP layer namespace; no SKY fallback aliases.
+        contract = compile_contract(semantic.expression, semantic.upstream_assignments,
+                                    set(_load_layer_map(Path(__file__).parent.parent / 'config/layers_ihp_sg13g2.json')),
+                                    infer_rule_type(rule.description))
+        if contract is not None:
+            parts.append('IHP contract: ' + json.dumps(contract, sort_keys=True))
     if semantic is not None and semantic.expression_refs:
         parts.append(f"Expression refs: {', '.join(semantic.expression_refs)}")
     if semantic is not None and semantic.upstream_assignments:
@@ -853,7 +1380,17 @@ def _load_existing_rule_summary(
     run_dir: Path,
     generator: str,
     llm_model: str | None,
+    cache_identity: dict[str, Any] | None = None,
 ) -> dict[str, Any] | None:
+    if cache_identity is not None:
+        identity_path = run_dir / "cache_identity.json"
+        if not identity_path.exists():
+            return None
+        try:
+            if json.loads(identity_path.read_text(encoding="utf-8")) != cache_identity:
+                return None
+        except (ValueError, OSError):
+            return None
     summary_path = run_dir / "summary.json"
     if not summary_path.exists():
         return None
@@ -950,6 +1487,35 @@ def _status_from_closed_loop_summary(
     }
 
 
+def _exact_target_status(summary: dict[str, Any], rule_id: str) -> dict[str, Any]:
+    iterations = summary.get("iterations") or []
+    cases = iterations[-1].get("cases", []) if iterations else []
+    good = [case for case in cases if case.get("intent") == "GOOD"]
+    bad = [case for case in cases if case.get("intent") == "BAD"]
+    evidence = bool(good and bad) and all(isinstance(case.get("category_hits"), dict) for case in good + bad)
+    def valid(case: dict[str, Any]) -> bool:
+        return bool(case.get("geometry_valid")) and case.get("drc_returncode") == 0
+    good_ok = evidence and all(valid(case) and case["category_hits"].get(rule_id, 0) == 0 for case in good)
+    bad_ok = evidence and all(valid(case) and case["category_hits"].get(rule_id, 0) > 0 for case in bad)
+    return {"exact_target_evidence": evidence, "exact_target_good_ok": bool(good_ok),
+            "exact_target_bad_ok": bool(bad_ok), "exact_target_strict": bool(good_ok and bad_ok)}
+
+
+def _cache_asset_identity(reference: str) -> dict[str, Any]:
+    path = Path(reference)
+    if not path.exists():
+        return {"reference": reference, "content_known": False}
+    files = [path] if path.is_file() else sorted(p for p in path.rglob("*") if p.is_file())
+    hashes = {}
+    for file in files:
+        digest = hashlib.sha256()
+        with file.open("rb") as stream:
+            for block in iter(lambda: stream.read(8 * 1024 * 1024), b""):
+                digest.update(block)
+        hashes[file.name if path.is_file() else str(file.relative_to(path))] = digest.hexdigest()
+    return {"path": str(path.resolve()), "content_known": True, "files": hashes}
+
+
 def run_runset_coverage(
     *,
     runset_path: Path,
@@ -962,6 +1528,9 @@ def run_runset_coverage(
     llm_trust_remote_code: bool = False,
     llm_load_in_4bit: bool = False,
     llm_repair: bool = True,
+    llm_fallback: bool | None = None,
+    llm_prompt_profile: str = 'legacy',
+    llm_strict_response: bool = False,
     llm_good_candidates: int = 1,
     llm_bad_candidates: int = 3,
     llm_illegal_candidates: int = 1,
@@ -976,13 +1545,63 @@ def run_runset_coverage(
     resume: bool = False,
     resume_rerun_not_covered: bool = False,
 ) -> dict[str, Any]:
-    layer_map_path = Path(__file__).resolve().parent.parent / "config" / "layers_sky130.json"
+    tech_name = detect_tech_name(runset_path)
+    layer_map_path = layer_map_path_for_runset(runset_path)
     wildcards = _parse_wildcards(runset_path)
     aliases = _parse_layer_aliases(runset_path, wildcards)
     _augment_layer_map_with_aliases(layer_map_path, aliases)
     layer_map = _load_layer_map(layer_map_path)
     rules = parse_runset_outputs(runset_path)
     semantics = parse_runset_output_semantics(runset_path)
+    directory_counts = Counter(rule.rule_id.replace("/", "_").replace(":", "_") for rule in rules)
+    generation_parameters = {
+        "tech_name": tech_name,
+        "generator": generator, "llm_model": llm_model, "llm_max_new_tokens": llm_max_new_tokens,
+        "llm_temperature": llm_temperature, "llm_top_p": llm_top_p,
+        "llm_trust_remote_code": llm_trust_remote_code, "llm_load_in_4bit": llm_load_in_4bit,
+        "llm_repair": llm_repair,
+        "llm_fallback": llm_repair if llm_fallback is None else llm_fallback,
+        "llm_prompt_profile": llm_prompt_profile,"llm_strict_response": llm_strict_response, "llm_good_candidates": llm_good_candidates,
+        "llm_bad_candidates": llm_bad_candidates, "llm_illegal_candidates": llm_illegal_candidates,
+        "llm_feedback_boost": llm_feedback_boost, "llm_candidate_growth": llm_candidate_growth,
+        "llm_max_candidates_per_intent": llm_max_candidates_per_intent,
+        "max_iters": max_iters, "initial_delta_nm": initial_delta_nm,
+    }
+    source_root = Path(__file__).parent
+    signature_inputs = {
+        "version": 3,
+        "runset_sha256": hashlib.sha256(runset_path.read_bytes()).hexdigest(),
+        "layer_map_sha256": hashlib.sha256(layer_map_path.read_bytes()).hexdigest(),
+        "parameters": generation_parameters,
+        "source_sha256": {path.name: hashlib.sha256(path.read_bytes()).hexdigest()
+                          for path in sorted(source_root.glob("*.py"))},
+        "converter": _cache_asset_identity(str(source_root.parent / "scripts/lpl_to_gds.rb")),
+        "python": {"executable": sys.executable, "version": sys.version},
+        "engine": _cache_asset_identity(shutil.which(_klayout_bin()) or _klayout_bin()),
+        "engine_environment": {name: os.environ.get(name, "") for name in
+                               ("AUTO_DRC_KLAYOUT_LD_LIBRARY_PATH", "LD_LIBRARY_PATH", "KLAYOUT_PATH")},
+    }
+    library_files = {}
+    library_directories = (os.environ.get("AUTO_DRC_KLAYOUT_LD_LIBRARY_PATH", "") + os.pathsep +
+                           os.environ.get("LD_LIBRARY_PATH", "")).split(os.pathsep)
+    for directory in dict.fromkeys(library_directories):
+        if directory:
+            for path in sorted(Path(directory).glob("libklayout*.so*")):
+                if path.is_file():
+                    resolved = str(path.resolve())
+                    if resolved not in library_files:
+                        library_files[resolved] = _cache_asset_identity(resolved)
+    signature_inputs["engine_libraries"] = library_files
+    if generator == "llm" and llm_model:
+        signature_inputs["model"] = _cache_asset_identity(llm_model)
+        versions = {}
+        for name in ("torch", "transformers", "tokenizers", "numpy", "accelerate", "bitsandbytes"):
+            try:
+                versions[name] = metadata.version(name)
+            except metadata.PackageNotFoundError:
+                versions[name] = None
+        signature_inputs["model_packages"] = versions
+    cache_signature = hashlib.sha256(json.dumps(signature_inputs, sort_keys=True).encode()).hexdigest()
 
     pairs = list(zip(rules, semantics))
     if rule_ids:
@@ -1001,6 +1620,11 @@ def run_runset_coverage(
     aligned_semantics, semantic_alignment_ok = _align_semantics(rules, semantics)
 
     out_dir.mkdir(parents=True, exist_ok=True)
+    cache_inputs_dir = out_dir / "cache_inputs"
+    cache_inputs_dir.mkdir(exist_ok=True)
+    cache_inputs_file = cache_inputs_dir / (cache_signature + ".json")
+    if not cache_inputs_file.exists():
+        cache_inputs_file.write_text(json.dumps(signature_inputs, indent=2, sort_keys=True), encoding="utf-8")
     rows_path = out_dir / "coverage_rows.jsonl"
     existing_rows = _load_existing_rows(rows_path) if resume else {}
     resumed_rows_from_cache = 0
@@ -1013,12 +1637,15 @@ def run_runset_coverage(
         cached_row: dict[str, Any] | None = None
         rerun_cached_row = False
         base = {
+            "tech_name": tech_name,
             "index": idx,
             "rule_id": rule.rule_id,
             "description": rule.description,
             "line_no": rule.line_no,
             "source_file": rule.source_file,
+            "cache_signature": cache_signature,
             "runset_expression": semantic.expression if semantic else "",
+            "runset_anonymous_body": semantic.anonymous_body if semantic else "",
             "runset_context_stack": list(semantic.context_stack) if semantic else [],
             "runset_defines": dict(runset_defines),
             "runset_expression_refs": list(semantic.expression_refs) if semantic else [],
@@ -1030,6 +1657,8 @@ def run_runset_coverage(
         }
         if resume:
             cached_row = existing_rows.get(_rule_identity(rule))
+            if cached_row is not None and cached_row.get("cache_signature") != cache_signature:
+                cached_row = None
             if cached_row is not None:
                 cached_status = str(cached_row.get("status") or "")
                 rerun_cached_row = resume_rerun_not_covered and cached_status != "covered"
@@ -1102,7 +1731,14 @@ def run_runset_coverage(
             rule_type_engine = rule_type
             threshold_engine = threshold_nm
 
-        run_dir = out_dir / "rules" / rule.rule_id.replace("/", "_").replace(":", "_")
+        directory_name = rule.rule_id.replace("/", "_").replace(":", "_")
+        if directory_counts[directory_name] > 1:
+            description_hash = hashlib.sha256(rule.description.encode()).hexdigest()[:12]
+            directory_name += f"_L{rule.line_no}_{description_hash}"
+        run_dir = out_dir / "rules" / directory_name
+        cache_identity = {"signature": cache_signature, "rule_id": rule.rule_id,
+                          "line_no": rule.line_no, "description": rule.description,
+                          "rule_text": _compose_runset_rule_text(rule, semantic), "defines": runset_defines}
         try:
             summary = None
             reused_existing_summary = False
@@ -1111,6 +1747,7 @@ def run_runset_coverage(
                     run_dir=run_dir,
                     generator=generator,
                     llm_model=llm_model,
+                    cache_identity=cache_identity,
                 )
                 reused_existing_summary = summary is not None
             if summary is None:
@@ -1135,6 +1772,8 @@ def run_runset_coverage(
                     llm_trust_remote_code=llm_trust_remote_code,
                     llm_load_in_4bit=llm_load_in_4bit,
                     llm_repair=llm_repair,
+                    llm_fallback=llm_fallback,llm_prompt_profile=llm_prompt_profile,
+                    llm_strict_response=llm_strict_response,
                     llm_good_candidates=llm_good_candidates,
                     llm_bad_candidates=llm_bad_candidates,
                     llm_illegal_candidates=llm_illegal_candidates,
@@ -1143,6 +1782,8 @@ def run_runset_coverage(
                     llm_max_candidates_per_intent=llm_max_candidates_per_intent,
                     runset_defines=runset_defines,
                 )
+                run_dir.mkdir(parents=True, exist_ok=True)
+                (run_dir / "cache_identity.json").write_text(json.dumps(cache_identity, indent=2), encoding="utf-8")
             if reused_existing_summary:
                 resumed_rules_from_summary += 1
 
@@ -1171,6 +1812,7 @@ def run_runset_coverage(
                     "run_dir": str(run_dir),
                 }
             )
+            base.update(_exact_target_status(summary, rule.rule_id))
         except Exception as exc:
             base.update(
                 {
@@ -1221,6 +1863,10 @@ def run_runset_coverage(
     rules_with_unresolved_refs = sum(1 for row in rows if row.get("runset_unresolved_refs"))
 
     summary = {
+        "coverage_criterion": "legacy_target_set; exact_target_strict separately requires the output ID itself",
+        "exact_target_covered_rules": sum(bool(row.get("exact_target_strict")) for row in rows),
+        "exact_target_unique_rule_ids_covered": len({row["rule_id"] for row in rows if row.get("exact_target_strict")}),
+        "exact_target_unverified_rules": sum(not row.get("exact_target_evidence", False) for row in rows),
         "runset_path": str(runset_path),
         "generator": generator,
         "llm_model": llm_model,
@@ -1229,6 +1875,8 @@ def run_runset_coverage(
         "llm_top_p": llm_top_p,
         "llm_load_in_4bit": llm_load_in_4bit,
         "llm_repair": llm_repair,
+        "llm_fallback": llm_repair if llm_fallback is None else llm_fallback,
+        "llm_prompt_profile": llm_prompt_profile,"llm_strict_response": llm_strict_response,
         "llm_good_candidates": llm_good_candidates,
         "llm_bad_candidates": llm_bad_candidates,
         "llm_illegal_candidates": llm_illegal_candidates,
@@ -1291,6 +1939,7 @@ def main() -> int:
             / "drc"
             / "sky130A_mr.drc"
         ),
+        help="Path to a DRC runset",
     )
     parser.add_argument("--out-dir", default="artifacts/runset_coverage")
     parser.add_argument("--generator", choices=["template", "llm"], default="template")
@@ -1304,6 +1953,9 @@ def main() -> int:
     parser.add_argument("--llm-trust-remote-code", action="store_true")
     parser.add_argument("--llm-load-in-4bit", action="store_true")
     parser.add_argument("--llm-disable-repair", action="store_true")
+    parser.add_argument("--llm-fallback",choices=["auto","enabled","disabled"],default="auto")
+    parser.add_argument("--llm-prompt-profile",choices=["legacy","compact","chat"],default="legacy")
+    parser.add_argument("--llm-strict-response",action="store_true")
     parser.add_argument(
         "--llm-disable-feedback-boost",
         action="store_true",
@@ -1367,6 +2019,8 @@ def main() -> int:
         llm_trust_remote_code=args.llm_trust_remote_code,
         llm_load_in_4bit=args.llm_load_in_4bit,
         llm_repair=not args.llm_disable_repair,
+        llm_fallback={'auto':None,'enabled':True,'disabled':False}[args.llm_fallback],
+        llm_prompt_profile=args.llm_prompt_profile,llm_strict_response=args.llm_strict_response,
         llm_feedback_boost=not args.llm_disable_feedback_boost,
         llm_candidate_growth=args.llm_candidate_growth,
         llm_max_candidates_per_intent=args.llm_max_candidates_per_intent,

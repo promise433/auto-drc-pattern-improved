@@ -6,12 +6,12 @@ from pathlib import Path
 import re
 from typing import Iterable
 
+from autodrc.runset_output_parser import find_output_calls
+from autodrc.tech import detect_tech_name, normalize_tech_name
 
-OUTPUT_RE = re.compile(
-    r"""\.output\(\s*"(?P<rule_id>[^"]+)"\s*,\s*"(?P<desc>[^"]+)"\s*\)""",
-    re.DOTALL,
-)
-THRESHOLD_RE = re.compile(r"(?P<value>\d+(?:\.\d+)?)\s*um")
+THRESHOLD_UM_RE = re.compile(r"(?P<value>\d+(?:\.\d+)?)\s*(?:um|µm)", re.IGNORECASE)
+THRESHOLD_INLINE_RE = re.compile(r"=\s*(?P<value>\d+(?:\.\d+)?)\b")
+_AREA_HINT_RE = re.compile(r"(?:um\^?2|µm\^?2|um2|µm2|um²|µm²)", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -24,9 +24,30 @@ class RunsetRule:
     source_file: str
 
 
-def _layer_from_rule_id(rule_id: str, description: str) -> str:
+def _layer_from_rule_id(rule_id: str, description: str, *, tech_name: str = "sky130") -> str:
+    tech = normalize_tech_name(tech_name)
     rid = rule_id.lower()
     desc = description.lower()
+    if tech == "ihp_sg13g2":
+        ihp_prefix_map = {
+            "nw": "nwell",
+            "pwb": "pwellblock",
+            "nbl": "nbulay",
+            "nblb": "nbulay_block",
+            "act": "activ",
+            "afil": "activ_filler",
+            "tgo": "thickgateox",
+            "gat": "gatpoly",
+            "gfil": "gatpoly_filler",
+            "cnt": "cont",
+            "cntb": "contbar",
+            "psd": "psd",
+            "nsd": "nsd",
+            "sdiod": "salblock",
+        }
+        rid_prefix = rid.split(".", 1)[0]
+        if rid_prefix in ihp_prefix_map:
+            return ihp_prefix_map[rid_prefix]
     if rid.startswith("modulecut.") or "modulecut" in desc:
         return "modulecut"
     if rid.startswith("difftap.") or " difftap " in desc:
@@ -51,34 +72,87 @@ def _layer_from_rule_id(rule_id: str, description: str) -> str:
         return "li1"
     if rid.startswith("poly.") or " poly " in desc:
         return "poly"
+    phrase_map: dict[str, str] = {}
+    if tech == "ihp_sg13g2":
+        phrase_map.update(
+            {
+                "nwell": "nwell",
+                "pwell:block": "pwellblock",
+                "pwell block": "pwellblock",
+                "nbulay:block": "nbulay_block",
+                "nbulay block": "nbulay_block",
+                "nbulay": "nbulay",
+                "activ:filler": "activ_filler",
+                "activ filler": "activ_filler",
+                "activ": "activ",
+                "gatpoly:filler": "gatpoly_filler",
+                "gatpoly filler": "gatpoly_filler",
+                "gatpoly": "gatpoly",
+                "contbar": "contbar",
+                "cont": "cont",
+                "thickgateox": "thickgateox",
+                "psd": "psd",
+                "nsd": "nsd",
+                "salblock": "salblock",
+            }
+        )
+    for token, layer in phrase_map.items():
+        if token in desc:
+            return layer
     return "unknown"
 
 
 def _threshold_from_description(description: str) -> int | None:
-    m = THRESHOLD_RE.search(description)
+    m = THRESHOLD_UM_RE.search(description)
+    if m:
+        return int(round(float(m.group("value")) * 1000))
+
+    if _AREA_HINT_RE.search(description):
+        return None
+
+    low = description.lower()
+    if not any(
+        token in low
+        for token in (
+            "width",
+            "space",
+            "spacing",
+            "enclosure",
+            "extension",
+            "overlap",
+            "notch",
+            "length",
+        )
+    ):
+        return None
+
+    m = THRESHOLD_INLINE_RE.search(description)
     if not m:
         return None
     return int(round(float(m.group("value")) * 1000))
 
 
 def parse_runset_outputs(runset_path: Path) -> list[RunsetRule]:
+    tech_name = detect_tech_name(runset_path)
     text = runset_path.read_text(encoding="utf-8", errors="replace")
     # Keep line numbers stable by replacing full-line comments with blank lines.
     lines = text.splitlines()
     cleaned_lines = [("" if line.lstrip().startswith("#") else line) for line in lines]
     cleaned = "\n".join(cleaned_lines)
     rows: list[RunsetRule] = []
-    for m in OUTPUT_RE.finditer(cleaned):
-        rule_id = m.group("rule_id")
-        desc = m.group("desc")
-        line_no = cleaned.count("\n", 0, m.start()) + 1
+    for item in find_output_calls(cleaned):
+        line_no = cleaned.count("\n", 0, item.start) + 1
         rows.append(
             RunsetRule(
-                rule_id=rule_id,
-                description=desc,
+                rule_id=item.rule_id,
+                description=item.description,
                 line_no=line_no,
-                threshold_nm=_threshold_from_description(desc),
-                layer_hint=_layer_from_rule_id(rule_id, desc),
+                threshold_nm=_threshold_from_description(item.description),
+                layer_hint=_layer_from_rule_id(
+                    item.rule_id,
+                    item.description,
+                    tech_name=tech_name,
+                ),
                 source_file=str(runset_path),
             )
         )
@@ -114,9 +188,9 @@ def main() -> int:
     import argparse
 
     p = argparse.ArgumentParser(
-        description="Extract SKY130 runset output rules and build Rule-to-Runset corpus."
+        description="Extract runset output rules and build Rule-to-Runset corpus."
     )
-    p.add_argument("--runset", required=True, help="Path to sky130A_mr.drc")
+    p.add_argument("--runset", required=True, help="Path to a DRC runset")
     p.add_argument(
         "--out-catalog",
         default="data/rule_to_runset/catalog.jsonl",

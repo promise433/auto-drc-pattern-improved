@@ -1,0 +1,454 @@
+{
+  "activ": [
+    1,
+    0
+  ],
+  "activ_mask": [
+    1,
+    20
+  ],
+  "activ_filler": [
+    1,
+    22
+  ],
+  "gatpoly": [
+    5,
+    0
+  ],
+  "poly": [
+    5,
+    0
+  ],
+  "gatpoly_filler": [
+    5,
+    22
+  ],
+  "cont": [
+    6,
+    0
+  ],
+  "contbar": [
+    6,
+    0
+  ],
+  "nsd": [
+    7,
+    0
+  ],
+  "psd": [
+    14,
+    0
+  ],
+  "met1": [
+    8,
+    0
+  ],
+  "m1": [
+    8,
+    0
+  ],
+  "metal1": [
+    8,
+    0
+  ],
+  "met2": [
+    10,
+    0
+  ],
+  "m2": [
+    10,
+    0
+  ],
+  "metal2": [
+    10,
+    0
+  ],
+  "met3": [
+    30,
+    0
+  ],
+  "m3": [
+    30,
+    0
+  ],
+  "metal3": [
+    30,
+    0
+  ],
+  "met4": [
+    50,
+    0
+  ],
+  "m4": [
+    50,
+    0
+  ],
+  "metal4": [
+    50,
+    0
+  ],
+  "met5": [
+    67,
+    0
+  ],
+  "via": [
+    19,
+    0
+  ],
+  "via1": [
+    19,
+    0
+  ],
+  "via2": [
+    29,
+    0
+  ],
+  "via3": [
+    49,
+    0
+  ],
+  "via4": [
+    66,
+    0
+  ],
+  "passiv": [
+    9,
+    0
+  ],
+  "edgeseal": [
+    39,
+    0
+  ],
+  "backmetal1": [
+    20,
+    0
+  ],
+  "topmetal1": [
+    126,
+    0
+  ],
+  "metal5": [
+    67,
+    0
+  ],
+  "m5": [
+    67,
+    0
+  ],
+  "metal5_filler": [
+    67,
+    22
+  ],
+  "metal5_slit": [
+    67,
+    24
+  ],
+  "mim": [
+    36,
+    0
+  ],
+  "nwell": [
+    31,
+    0
+  ],
+  "nbulay": [
+    32,
+    0
+  ],
+  "nbulay_block": [
+    32,
+    21
+  ],
+  "pwell": [
+    46,
+    0
+  ],
+  "pwellblock": [
+    46,
+    21
+  ],
+  "pwell_block": [
+    46,
+    21
+  ],
+  "thickgateox": [
+    44,
+    0
+  ],
+  "salblock": [
+    28,
+    0
+  ],
+  "trans": [
+    26,
+    0
+  ],
+  "digibnd": [
+    16,
+    0
+  ],
+  "extblock": [
+    111,
+    0
+  ],
+  "topvia1": [
+    125,
+    0
+  ],
+  "topvia2": [
+    133,
+    0
+  ],
+  "topmetal2": [
+    134,
+    0
+  ],
+  "topmetal2_filler": [
+    134,
+    22
+  ],
+  "topmetal2_slit": [
+    134,
+    24
+  ],
+  "lbe": [
+    157,
+    0
+  ],
+  "activ_pin": [
+    1,
+    2
+  ],
+  "activ_nofill": [
+    1,
+    23
+  ],
+  "biwind": [
+    3,
+    0
+  ],
+  "gatpoly_pin": [
+    5,
+    2
+  ],
+  "gatpoly_nofill": [
+    5,
+    23
+  ],
+  "nsd_block": [
+    7,
+    21
+  ],
+  "metal1_pin": [
+    8,
+    2
+  ],
+  "metal1_filler": [
+    8,
+    22
+  ],
+  "metal1_nofill": [
+    8,
+    23
+  ],
+  "metal1_slit": [
+    8,
+    24
+  ],
+  "metal2_pin": [
+    10,
+    2
+  ],
+  "metal2_filler": [
+    10,
+    22
+  ],
+  "metal2_nofill": [
+    10,
+    23
+  ],
+  "metal2_slit": [
+    10,
+    24
+  ],
+  "baspoly": [
+    13,
+    0
+  ],
+  "res": [
+    24,
+    0
+  ],
+  "sram": [
+    25,
+    0
+  ],
+  "ind": [
+    27,
+    0
+  ],
+  "metal3_pin": [
+    30,
+    2
+  ],
+  "metal3_filler": [
+    30,
+    22
+  ],
+  "metal3_nofill": [
+    30,
+    23
+  ],
+  "metal3_slit": [
+    30,
+    24
+  ],
+  "nwell_pin": [
+    31,
+    2
+  ],
+  "emwind": [
+    33,
+    0
+  ],
+  "deepco": [
+    35,
+    0
+  ],
+  "dfpad": [
+    41,
+    0
+  ],
+  "dfpad_pillar": [
+    41,
+    35
+  ],
+  "dfpad_sbump": [
+    41,
+    36
+  ],
+  "metal4_pin": [
+    50,
+    2
+  ],
+  "metal4_filler": [
+    50,
+    22
+  ],
+  "metal4_nofill": [
+    50,
+    23
+  ],
+  "metal4_slit": [
+    50,
+    24
+  ],
+  "empoly": [
+    55,
+    0
+  ],
+  "digisub": [
+    60,
+    0
+  ],
+  "metal5_pin": [
+    67,
+    2
+  ],
+  "metal5_nofill": [
+    67,
+    23
+  ],
+  "polimide": [
+    98,
+    0
+  ],
+  "recog": [
+    99,
+    0
+  ],
+  "recog_esd": [
+    99,
+    30
+  ],
+  "recog_diode": [
+    99,
+    31
+  ],
+  "recog_tsv": [
+    99,
+    32
+  ],
+  "topmetal1_pin": [
+    126,
+    2
+  ],
+  "topmetal1_filler": [
+    126,
+    22
+  ],
+  "topmetal1_nofill": [
+    126,
+    23
+  ],
+  "topmetal1_slit": [
+    126,
+    24
+  ],
+  "polyres": [
+    128,
+    0
+  ],
+  "vmim": [
+    129,
+    0
+  ],
+  "topmetal2_pin": [
+    134,
+    2
+  ],
+  "topmetal2_nofill": [
+    134,
+    23
+  ],
+  "colwind": [
+    139,
+    0
+  ],
+  "rfmem": [
+    147,
+    0
+  ],
+  "deepvia": [
+    152,
+    0
+  ],
+  "nometfiller": [
+    160,
+    0
+  ],
+  "pemwind": [
+    11,
+    0
+  ],
+  "pempoly": [
+    53,
+    0
+  ],
+  "ldmos": [
+    57,
+    0
+  ],
+  "pbiwind": [
+    58,
+    0
+  ],
+  "flash": [
+    71,
+    0
+  ],
+  "text_0": [
+    63,
+    0
+  ]
+}

@@ -26,10 +26,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "--min-density-bps",
         type=int,
-        help="Minimum density threshold (basis points, 3000=30%)",
+        help="Minimum density threshold (basis points, 3000=30%%)",
     )
     parser.add_argument("--endcap-nm", type=int, help="Minimum poly endcap threshold (nm)")
     parser.add_argument("--delta-nm", type=int, default=20, help="Margin from threshold")
+    parser.add_argument(
+        "--tech-name",
+        default="sky130",
+        choices=["sky130", "ihp_sg13g2"],
+        help="Technology-specific layer/context rules to use",
+    )
     parser.add_argument("--out-dir", default="data/seed_cases", help="Output directory")
     parser.add_argument("--prefix", default="seed", help="Output file prefix")
     return parser
@@ -66,7 +72,11 @@ def main() -> int:
             threshold = args.endcap_nm
 
     cases = generate_cases_for_rule(
-        rule_type=rule_type, layer=layer, threshold_nm=threshold, delta_nm=args.delta_nm
+        rule_type=rule_type,
+        layer=layer,
+        threshold_nm=threshold,
+        delta_nm=args.delta_nm,
+        tech_name=args.tech_name,
     )
 
     out_paths = write_cases(cases, Path(args.out_dir), prefix=args.prefix)

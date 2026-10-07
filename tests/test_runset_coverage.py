@@ -7,11 +7,156 @@ from pathlib import Path
 from unittest.mock import patch
 
 from autodrc.runset_corpus import RunsetRule
-from autodrc.runset_coverage import classify_rule, infer_rule_type, run_runset_coverage
+from autodrc.runset_coverage import (
+    _exact_target_status,
+    _parse_layer_aliases,
+    _resolve_layer_token,
+    classify_rule,
+    infer_rule_type,
+    infer_threshold,
+    run_runset_coverage,
+)
 from autodrc.runset_semantics import RunsetOutputSemantic
 
 
 class RunsetCoverageTests(unittest.TestCase):
+    def test_exact_target_does_not_accept_legacy_alias_or_invalid_layout(self) -> None:
+        for target,alias in (("cap2m.3","cap2m.3_a"),("m1.4a_a","m1.4a")):
+            good=dict(intent="GOOD",geometry_valid=True,drc_returncode=0,category_hits={})
+            bad=dict(intent="BAD",geometry_valid=True,drc_returncode=0,category_hits={alias:1})
+            summary=dict(converged=True,iterations=[dict(good_ok=True,bad_ok=True,cases=[good,bad])])
+            self.assertFalse(_exact_target_status(summary,target)["exact_target_strict"])
+            bad["category_hits"]={target:1}
+            self.assertTrue(_exact_target_status(summary,target)["exact_target_strict"])
+            bad["geometry_valid"]=False
+            self.assertFalse(_exact_target_status(summary,target)["exact_target_strict"])
+            bad["geometry_valid"]=True
+            bad["drc_returncode"]=1
+            self.assertFalse(_exact_target_status(summary,target)["exact_target_strict"])
+
+    def test_legacy_success_without_cases_has_no_exact_target_evidence(self) -> None:
+        summary=dict(converged=True,iterations=[dict(good_ok=True,bad_ok=True)])
+        status=_exact_target_status(summary,"m1.1")
+        self.assertFalse(status["exact_target_evidence"])
+        self.assertFalse(status["exact_target_strict"])
+
+    def test_resume_detects_ld_library_path_engine_library_replacement(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            runset = root / "x.drc"
+            runset.write_text('m1.width(0.14).output("m1.1", "min. m1 width : 0.14um")')
+            library = root / "libklayout_test.so"
+            library.write_bytes(b"first")
+            summary = dict(generator="template",converged=True,iterations_run=1,
+                           iterations=[dict(good_ok=True,bad_ok=True)])
+            options = dict(runset_path=runset,out_dir=root/"output")
+            with patch.dict("os.environ", {"LD_LIBRARY_PATH":str(root),"AUTO_DRC_KLAYOUT_LD_LIBRARY_PATH":""}), patch(
+                "autodrc.runset_coverage.run_closed_loop",return_value=summary
+            ) as loop:
+                run_runset_coverage(**options)
+                run_runset_coverage(**options,resume=True)
+                self.assertEqual(loop.call_count,1)
+                library.write_bytes(b"other")
+                run_runset_coverage(**options,resume=True)
+                self.assertEqual(loop.call_count,2)
+
+    def test_resume_detects_same_path_model_and_engine_content_replacement(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            runset=root/"x.drc"
+            runset.write_text('m1.width(0.14).output("m1.1", "min. m1 width : 0.14um")')
+            model=root/"model"
+            model.mkdir()
+            weights=model/"weights.safetensors"
+            weights.write_bytes(b"first")
+            engine=root/"klayout"
+            engine.write_bytes(b"first")
+            summary=dict(generator="llm",llm_model=str(model),converged=True,iterations_run=1,
+                         iterations=[dict(good_ok=True,bad_ok=True)])
+            options=dict(runset_path=runset,out_dir=root/"output",generator="llm",llm_model=str(model))
+            with patch("autodrc.runset_coverage._klayout_bin",return_value=str(engine)), patch(
+                "autodrc.runset_coverage.run_closed_loop",return_value=summary
+            ) as loop:
+                run_runset_coverage(**options)
+                run_runset_coverage(**options,resume=True)
+                self.assertEqual(loop.call_count,1)
+                weights.write_bytes(b"other")
+                run_runset_coverage(**options,resume=True)
+                self.assertEqual(loop.call_count,2)
+                engine.write_bytes(b"other")
+                run_runset_coverage(**options,resume=True)
+                self.assertEqual(loop.call_count,3)
+
+    def test_duplicate_ids_keep_separate_artifacts_and_summary_resume(self) -> None:
+        text = ('m1.width(0.14).output("dup.1", "min. m1 width : 0.14um")\n'
+                'm1.width(0.20).output("dup.1", "min. m1 width : 0.20um")\n')
+        def loop(**kwargs):
+            directory = kwargs["out_dir"]
+            directory.mkdir(parents=True, exist_ok=True)
+            result = dict(generator="template", iterations_run=1, converged=True,
+                          rule_text=kwargs["rule_text"], iterations=[dict(good_ok=True, bad_ok=True)])
+            (directory / "summary.json").write_text(json.dumps(result))
+            return result
+        with tempfile.TemporaryDirectory() as tmp:
+            runset = Path(tmp) / "x.drc"
+            output = Path(tmp) / "out"
+            runset.write_text(text)
+            with patch("autodrc.runset_coverage.run_closed_loop", side_effect=loop) as mocked:
+                first = run_runset_coverage(runset_path=runset, out_dir=output)
+                self.assertEqual(mocked.call_count, 2)
+            directories = [Path(row["run_dir"]) for row in first["rows"]]
+            self.assertNotEqual(*directories)
+            self.assertNotEqual((directories[0]/"summary.json").read_text(), (directories[1]/"summary.json").read_text())
+            with patch("autodrc.runset_coverage.run_closed_loop", side_effect=loop) as mocked:
+                resumed = run_runset_coverage(runset_path=runset, out_dir=output, resume=True)
+                mocked.assert_not_called()
+                self.assertEqual(resumed["summary"]["resumed_rows_from_cache"], 2)
+            (output/"coverage_rows.jsonl").unlink()
+            with patch("autodrc.runset_coverage.run_closed_loop", side_effect=loop) as mocked:
+                resumed = run_runset_coverage(runset_path=runset, out_dir=output, resume=True)
+                mocked.assert_not_called()
+                self.assertEqual(resumed["summary"]["resumed_rules_from_summary"], 2)
+            self.assertEqual([row["run_dir"] for row in resumed["rows"]], [str(p) for p in directories])
+
+    def test_resume_recomputes_when_generation_parameters_or_runset_change(self) -> None:
+        text = 'm1.width(0.14).output("m1.1", "min. m1 width : 0.14um")\n'
+        summary = dict(generator="template", iterations_run=1, converged=True,
+                       iterations=[dict(good_ok=True, bad_ok=True)])
+        with tempfile.TemporaryDirectory() as tmp:
+            runset = Path(tmp) / "x.drc"
+            output = Path(tmp) / "out"
+            runset.write_text(text)
+            with patch("autodrc.runset_coverage.run_closed_loop", return_value=summary):
+                run_runset_coverage(runset_path=runset, out_dir=output)
+            with patch("autodrc.runset_coverage.run_closed_loop", return_value=summary) as mocked:
+                changed = run_runset_coverage(runset_path=runset, out_dir=output, resume=True, initial_delta_nm=60)
+                self.assertEqual(mocked.call_count, 1)
+                self.assertFalse(changed["rows"][0].get("resumed_from_cache", False))
+            runset.write_text(text.replace("width(0.14)", "width(0.15)"))
+            with patch("autodrc.runset_coverage.run_closed_loop", return_value=summary) as mocked:
+                run_runset_coverage(runset_path=runset, out_dir=output, resume=True, initial_delta_nm=60)
+                self.assertEqual(mocked.call_count, 1)
+
+    def test_sky_hv_marker_enclosure_keeps_distinct_layers(self) -> None:
+        description = "nwell.9 : HVnwell must be enclosed by hv marker"
+        rule = RunsetRule("nwell.9", description, 332, None, "unknown", "sky130A_mr.drc")
+        semantic = self._semantic(
+            rule_id=rule.rule_id, description=description,
+            expression="nwell .interacting(nwell.and(hvmarker)) .not(hvmarker)",
+            expression_refs=("nwell", "hvmarker"),
+            upstream_vars=("nwell", "hvi", "rdl", "vhvi", "uhvi", "hvmarker"),
+        )
+        info = classify_rule(rule, {"nwell", "hvi", "rdl", "vhvi", "uhvi"}, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual((info["layer"], info["layer_b"]), ("hvi", "nwell"))
+
+    def test_sky_straddle_retains_template_layer_orientation(self) -> None:
+        rule = RunsetRule("MR_lvtn.OVL.2", "MR_lvtn.OVL.2 : lvtn must not straddle nwell",
+                          387, None, "unknown", "sky130A_mr.drc")
+        info = classify_rule(rule, {"lvtn", "nwell"})
+        self.assertTrue(info["supported"])
+        self.assertEqual((info["layer"], info["layer_b"]), ("nwell", "lvtn"))
+
     def _semantic(
         self,
         *,
@@ -57,6 +202,66 @@ class RunsetCoverageTests(unittest.TestCase):
             infer_rule_type("ct.3_a : max. width of ring-shaped mcon : 0.175um"),
             "max_width",
         )
+        self.assertEqual(
+            infer_rule_type("5.5. Act.b : Min. Activ space or notch: 0.21 µm."),
+            "min_spacing",
+        )
+        self.assertEqual(
+            infer_rule_type("Min. ThickGateOx extension over Activ = 0.27"),
+            "min_enclosure",
+        )
+        self.assertEqual(
+            infer_rule_type("Min. Activ drain/source extension = 0.23"),
+            "min_enclosure",
+        )
+        self.assertEqual(
+            infer_rule_type("Cont must be within Activ or GatPoly"),
+            "min_enclosure",
+        )
+        self.assertEqual(
+            infer_rule_type("Cont must be covered with Metal1"),
+            "min_enclosure",
+        )
+        self.assertEqual(
+            infer_rule_type("45-degree and 90-degree angles for GatPoly on Activ area are not allowed"),
+            "forbidden_angle",
+        )
+        self.assertEqual(
+            infer_rule_type("Max. Activ:filler width = 5.00"),
+            "max_width",
+        )
+        self.assertEqual(
+            infer_rule_type("Min. ContBar length = 0.34"),
+            "min_length",
+        )
+        self.assertEqual(
+            infer_rule_type("Max. MIM area per MIM device (µm²) = 5625.00"),
+            "max_area",
+        )
+        self.assertEqual(
+            infer_rule_type("TopVia1 must be over MIM"),
+            "via_enclosure",
+        )
+
+    def test_infer_threshold_supports_area_unit_before_value(self) -> None:
+        self.assertEqual(infer_threshold("min_area", "Min. Activ area (µm²) = 0.122"), 122000)
+        self.assertEqual(infer_threshold("max_area", "Max. MIM area per MIM device (µm²) = 5625.00"), 5625000000)
+
+    def test_parse_layer_aliases_reads_ihp_source_polygons(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            runset_path = Path(tmp) / "sg13g2_maximal.drc"
+            runset_path.write_text(
+                'metal5 = source.polygons("67/0")\n'
+                'topvia2 = source.polygons("133/0")\n',
+                encoding="utf-8",
+            )
+            aliases = _parse_layer_aliases(runset_path, {})
+        self.assertEqual(aliases["metal5"], (67, 0))
+        self.assertEqual(aliases["topvia2"], (133, 0))
+
+    def test_resolve_layer_token_uses_ihp_alias_only_in_ihp_context(self) -> None:
+        self.assertEqual(_resolve_layer_token("cntb", {"contbar", "cont"}), "contbar")
+        self.assertIsNone(_resolve_layer_token("cntb", {"met1", "mcon", "diff"}))
 
     def test_classify_must_interact(self) -> None:
         rule = RunsetRule(
@@ -135,6 +340,347 @@ class RunsetCoverageTests(unittest.TestCase):
         self.assertTrue(info["supported"])
         self.assertEqual(info["rule_type"], "forbidden_use")
         self.assertEqual(info["layer"], "modulecut")
+
+    def test_classify_extension_over_prefers_semantic_enclosure_pair(self) -> None:
+        rule = RunsetRule(
+            rule_id="TGO.a",
+            description="Min. ThickGateOx extension over Activ = 0.27",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="thickgateox",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="Activ.ext_enclosed(ThickGateOx, 0.27.um)",
+            expression_refs=("activ", "thickgateox"),
+            upstream_vars=("activ", "thickgateox"),
+        )
+        layer_map = {"activ", "thickgateox"}
+        info = classify_rule(rule, layer_map, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_enclosure")
+        self.assertEqual(info["layer"], "thickgateox")
+        self.assertEqual(info["layer_b"], "activ")
+
+    def test_classify_cover_only_within_rule(self) -> None:
+        rule = RunsetRule(
+            rule_id="Cnt.g",
+            description="Cont must be within Activ or GatPoly",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="cont",
+            source_file="x.drc",
+        )
+        layer_map = {"cont", "activ", "gatpoly"}
+        info = classify_rule(rule, layer_map)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_enclosure")
+        self.assertEqual(info["layer_b"], "cont")
+        self.assertEqual(info["layer"], "activ")
+
+    def test_classify_sky130_does_not_adopt_ihp_text_layers(self) -> None:
+        rule = RunsetRule(
+            rule_id="Act.a",
+            description="Min. Activ width = 0.62",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        info = classify_rule(rule, {"met1", "diff", "poly"})
+        self.assertFalse(info["supported"])
+        self.assertEqual(info["reason"], "unknown_layer")
+
+    def test_classify_min_length_uses_contbar_layer(self) -> None:
+        rule = RunsetRule(
+            rule_id="CntB.a1",
+            description="Min. ContBar length = 0.34",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        layer_map = {"cont", "contbar"}
+        info = classify_rule(rule, layer_map)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_length")
+        self.assertEqual(info["layer"], "contbar")
+        self.assertEqual(info["threshold_nm"], 340)
+
+    def test_classify_pwell_block_width_prefers_specific_text_layer(self) -> None:
+        rule = RunsetRule(
+            rule_id="PWB.a",
+            description="Min. PWell:block width = 0.62",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="PWell_block_PWB_a.dup",
+            expression_refs=("pwell_block_pwb_a",),
+            upstream_vars=("pwell", "pwellblock"),
+        )
+        info = classify_rule(rule, {"pwell", "pwellblock"}, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_width")
+        self.assertEqual(info["layer"], "pwellblock")
+        self.assertEqual(info["threshold_nm"], 620)
+
+    def test_classify_nbulay_width_prefers_prefix_aligned_semantic_layer(self) -> None:
+        rule = RunsetRule(
+            rule_id="NBL.a",
+            description="Min. nBuLay width = 1.00",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="nBuLayGen_nBuLay_NBL_a.dup",
+            expression_refs=("nbulaygen_nbulay_nbl_a",),
+            upstream_vars=("nwell", "nbulay", "nbulay_block"),
+        )
+        info = classify_rule(rule, {"nwell", "nbulay", "nbulay_block"}, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_width")
+        self.assertEqual(info["layer"], "nbulay")
+        self.assertEqual(info["threshold_nm"], 1000)
+
+    def test_classify_spacing_prefers_subject_layer_over_inside_context(self) -> None:
+        rule = RunsetRule(
+            rule_id="NW.d1",
+            description="Min. NWell space to external N+Activ inside ThickGateOx = 0.62",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="NWell.ext_separation(NActHV_ana, 0.62.um)",
+            expression_refs=("nwell", "nacthv_ana"),
+            upstream_vars=("activ", "nwell", "thickgateox"),
+        )
+        info = classify_rule(rule, {"activ", "nwell", "thickgateox"}, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_spacing")
+        self.assertEqual(info["layer"], "nwell")
+
+    def test_classify_psd_spacing_prefers_subject_layer_over_inside_context(self) -> None:
+        rule = RunsetRule(
+            rule_id="pSD.j1",
+            description="Min. pSD space to NFET gate inside ThickGateOx = 0.40",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="pSD_Nsram.ext_separation(NGate_outside_SVaricap.inside(ThickGateOx), 0.4.um)",
+            expression_refs=("psd_nsram", "ngate_outside_svaricap", "thickgateox"),
+            upstream_vars=("psd", "gatpoly", "thickgateox"),
+        )
+        info = classify_rule(rule, {"psd", "gatpoly", "thickgateox"}, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_spacing")
+        self.assertEqual(info["layer"], "psd")
+
+    def test_classify_width_prefers_subject_layer_over_semantic_context(self) -> None:
+        rule = RunsetRule(
+            rule_id="Rppd.a",
+            description="Min. GatPoly width = 0.50",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="Rppd_all.ext_width(0.5.um)",
+            expression_refs=("rppd_all",),
+            upstream_vars=("activ", "gatpoly", "psd", "salblock"),
+        )
+        info = classify_rule(rule, {"activ", "gatpoly", "psd", "salblock"}, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_width")
+        self.assertEqual(info["layer"], "gatpoly")
+
+    def test_classify_nsd_block_width_prefers_subject_layer(self) -> None:
+        rule = RunsetRule(
+            rule_id="nmosi.f",
+            description="Min. nSD:block width to separate ptap in nmosi = 0.62",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="nSDBlock_Iso_PWell_Act.ext_width(0.62.um)",
+            expression_refs=("nsdblock_iso_pwell_act",),
+            upstream_vars=("activ", "nsd_block", "nbulay", "pwell_block"),
+        )
+        info = classify_rule(rule, {"activ", "nsd_block", "nbulay", "pwell_block"}, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_width")
+        self.assertEqual(info["layer"], "nsd_block")
+
+    def test_classify_via3_array_spacing_prefers_subject_layer(self) -> None:
+        rule = RunsetRule(
+            rule_id="V3.b1",
+            description=(
+                "Min. Via3 space in an array of more than 3 rows and more then 3 columns "
+                "(V3.b1 is only required in one direction. The distance of the other "
+                "direction must be at least V3.b.) = 0.29"
+            ),
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="via3SepErr_2.ext_or(via3In.ext_touching(via3SepErr_2))",
+            expression_refs=("via3seperr_2", "via3in"),
+            upstream_vars=("edgeseal", "via3", "via3array"),
+        )
+        info = classify_rule(rule, {"edgeseal", "via3"}, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_spacing")
+        self.assertEqual(info["layer"], "via3")
+
+    def test_classify_via4_array_spacing_prefers_subject_layer(self) -> None:
+        rule = RunsetRule(
+            rule_id="V4.b1",
+            description=(
+                "Min. Via4 space in an array of more than 3 rows and more then 3 columns "
+                "(V4.b1 is only required in one direction. The distance of the other "
+                "direction must be at least V4.b.) = 0.29"
+            ),
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="via4SepErr_2.ext_or(via4In.ext_touching(via4SepErr_2))",
+            expression_refs=("via4seperr_2", "via4in"),
+            upstream_vars=("edgeseal", "via4", "via4array"),
+        )
+        info = classify_rule(rule, {"edgeseal", "via4"}, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_spacing")
+        self.assertEqual(info["layer"], "via4")
+
+    def test_classify_topmetal1_max_width_prefers_text_specific_layer(self) -> None:
+        rule = RunsetRule(
+            rule_id="Slt.c.TM1",
+            description="Max. TopMetal1 width without requiring a slit = 30.00",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="tM1_L2.sized(15.um, acute_limit)",
+            expression_refs=("tm1_l2",),
+            upstream_vars=("mim", "topmetal1", "topmetal1_slit"),
+        )
+        info = classify_rule(
+            rule,
+            {"mim", "topmetal1", "topmetal1_slit"},
+            semantic=semantic,
+        )
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "max_width")
+        self.assertEqual(info["layer"], "topmetal1")
+        self.assertEqual(info["threshold_nm"], 30000)
+
+    def test_classify_seal_width_keeps_semantic_primary_layer(self) -> None:
+        rule = RunsetRule(
+            rule_id="Seal.a_Metal1",
+            description="Min. EdgeSeal-Metal1 width = 3.50",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="unknown",
+            source_file="x.drc",
+        )
+        semantic = self._semantic(
+            rule_id=rule.rule_id,
+            description=rule.description,
+            expression="Metal1_edgA1_in.ext_width(3.5.um, metric: projection)",
+            expression_refs=("metal1_edga1_in", "metric"),
+            upstream_vars=("metal1", "edgeseal"),
+        )
+        info = classify_rule(rule, {"metal1", "edgeseal"}, semantic=semantic)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_width")
+        self.assertEqual(info["layer"], "metal1")
+        self.assertEqual(info["threshold_nm"], 3500)
+
+    def test_classify_max_area_rule(self) -> None:
+        rule = RunsetRule(
+            rule_id="MIM.g",
+            description="Max. MIM area per MIM device (µm²) = 5625.00",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="mim",
+            source_file="x.drc",
+        )
+        layer_map = {"mim"}
+        info = classify_rule(rule, layer_map)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "max_area")
+        self.assertEqual(info["layer"], "mim")
+        self.assertEqual(info["threshold_nm"], 5625000000)
+
+    def test_classify_cover_only_via_over_rule(self) -> None:
+        rule = RunsetRule(
+            rule_id="MIM.h",
+            description="TopVia1 must be over MIM",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="mim",
+            source_file="x.drc",
+        )
+        layer_map = {"mim", "topvia1"}
+        info = classify_rule(rule, layer_map)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "via_enclosure")
+        self.assertEqual(info["layer"], "mim")
+        self.assertEqual(info["layer_b"], "topvia1")
+
+    def test_classify_zero_threshold_uses_small_epsilon(self) -> None:
+        rule = RunsetRule(
+            rule_id="nSDB.e",
+            description="Min. nSD:block space to Cont = 0.00",
+            line_no=1,
+            threshold_nm=None,
+            layer_hint="cont",
+            source_file="x.drc",
+        )
+        layer_map = {"cont"}
+        info = classify_rule(rule, layer_map)
+        self.assertTrue(info["supported"])
+        self.assertEqual(info["rule_type"], "min_spacing")
+        self.assertEqual(info["threshold_nm"], 1)
 
     def test_classify_via4_enclose_all_pair_order(self) -> None:
         rule = RunsetRule(
@@ -527,7 +1073,10 @@ m2.width(0.14).output("m2.1", "m2.1 : min. m2 width : 0.14um")
             out_dir = Path(tmp) / "out"
             runset_path.write_text(runset_text, encoding="utf-8")
             cached_path = out_dir / "rules" / "m1.1"
-            cached_path.mkdir(parents=True, exist_ok=True)
+            # Create the identity evidence required by reliable summary resume.
+            with patch("autodrc.runset_coverage.run_closed_loop", return_value=cached_summary):
+                run_runset_coverage(runset_path=runset_path, out_dir=out_dir, max_iters=1, rule_ids=["m1.1"])
+            (out_dir / "coverage_rows.jsonl").unlink()
             (cached_path / "summary.json").write_text(
                 json.dumps(cached_summary), encoding="utf-8"
             )

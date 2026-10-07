@@ -8,6 +8,7 @@ from autodrc.casegen import PatternCase, generate_cases_for_rule
 from autodrc.closed_loop import run_closed_loop
 from autodrc.lpl import Polygon
 from autodrc.specs import KNOWN_TASKS, UNKNOWN_TASKS, RuleTask
+from autodrc.tech import require_sky_research
 
 
 DENSITY_WINDOW_AREA_NM2 = 2000 * 2000
@@ -111,12 +112,17 @@ def check_case_semantics(case: PatternCase, task: RuleTask) -> bool:
     return False
 
 
-def evaluate_task_semantics(task: RuleTask, delta_nm: int = 20) -> dict[str, Any]:
+def evaluate_task_semantics(
+    task: RuleTask,
+    delta_nm: int = 20,
+    tech_name: str = "sky130",
+) -> dict[str, Any]:
     cases = generate_cases_for_rule(
         rule_type=task.rule_type,
         layer=task.layer,
         threshold_nm=task.threshold_nm,
         delta_nm=delta_nm,
+        tech_name=tech_name,
     )
     checks = []
     for case in cases:
@@ -141,7 +147,9 @@ def evaluate_generalization(
     include_unknown: bool = True,
     delta_nm: int = 20,
     with_drc_for_known: bool = False,
+    tech_name: str = "sky130",
 ) -> dict[str, Any]:
+    require_sky_research(tech_name)
     out_dir.mkdir(parents=True, exist_ok=True)
     tasks: list[RuleTask] = []
     if include_known:
@@ -149,7 +157,7 @@ def evaluate_generalization(
     if include_unknown:
         tasks.extend(UNKNOWN_TASKS)
 
-    rows = [evaluate_task_semantics(task, delta_nm=delta_nm) for task in tasks]
+    rows = [evaluate_task_semantics(task, delta_nm=delta_nm, tech_name=tech_name) for task in tasks]
 
     if with_drc_for_known:
         drc_rows: list[dict[str, Any]] = []
@@ -194,6 +202,7 @@ def main() -> int:
     p = argparse.ArgumentParser(
         description="Generalization and robustness evaluation for known/unknown rules."
     )
+    p.add_argument("--tech-name", default="sky130")
     p.add_argument("--out-dir", default="runs/generalization")
     p.add_argument("--delta-nm", type=int, default=20)
     p.add_argument("--include-known", action="store_true")
@@ -205,6 +214,7 @@ def main() -> int:
     include_unknown = args.include_unknown or (not args.include_known)
 
     summary = evaluate_generalization(
+        tech_name=args.tech_name,
         out_dir=Path(args.out_dir),
         include_known=include_known,
         include_unknown=include_unknown,

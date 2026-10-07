@@ -23,6 +23,7 @@ layer_map = {
 
 if defined?($layer_map_json) && $layer_map_json
   loaded = JSON.parse(File.read($layer_map_json))
+  layer_map = {}
   loaded.each do |name, pair|
     layer_map[name.to_s.downcase] = [Integer(pair[0]), Integer(pair[1])]
   end
@@ -49,6 +50,19 @@ lpl.each_with_index do |poly, idx|
 
   layer_index = layout.layer(Integer(layer_pair[0]), Integer(layer_pair[1]))
   top.shapes(layer_index).insert(RBA::Polygon::new(points))
+end
+
+labels = data["labels"] || []
+labels.each_with_index do |label, idx|
+  layer_name = label.fetch("layer").to_s.downcase
+  layer_pair = layer_map[layer_name]
+  abort("Unknown layer '#{layer_name}' at label #{idx}") unless layer_pair
+  text = label.fetch("text")
+  abort("Invalid text at label #{idx}") unless text.is_a?(String) && !text.empty? && !text.include?("\0")
+  position = label.fetch("position")
+  abort("Invalid position at label #{idx}") unless position.length == 2 && position.all? { |v| v.is_a?(Integer) }
+  layer_index = layout.layer(Integer(layer_pair[0]), Integer(layer_pair[1]))
+  top.shapes(layer_index).insert(RBA::Text.new(text, RBA::Trans.new(position[0], position[1])))
 end
 
 layout.write($output_gds)

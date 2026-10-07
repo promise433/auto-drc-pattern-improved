@@ -3,17 +3,41 @@ from __future__ import annotations
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from autodrc.closed_loop import (
+    _klayout_bin,
     _generate_cases,
     _next_delta_nm,
     _next_llm_candidate_counts,
     evaluate_intent,
     parse_lyrdb_items,
+    run_cmd,
 )
+from autodrc.llm_generator import LLMResponseError
 
 
 class ClosedLoopHelpersTests(unittest.TestCase):
+    def test_model_output_fallback_requires_repair_and_response_errors(self) -> None:
+        options = dict(generator="llm", rule_type="min_width", layer="met1", threshold_nm=140,
+            delta_nm=20, rule_text="Minimum width 0.14um on met1", llm_model="fixture",
+            llm_max_new_tokens=128, llm_temperature=0.2, llm_top_p=0.9,
+            llm_trust_remote_code=False, llm_load_in_4bit=False)
+        with tempfile.TemporaryDirectory() as tmp, patch(
+            "autodrc.closed_loop.generate_case_with_llm", side_effect=LLMResponseError("truncated JSON")
+        ):
+            cases = _generate_cases(**options, llm_debug_dir=Path(tmp), llm_repair=True)
+            self.assertEqual([c.intent for c in cases], ["GOOD", "BAD", "ILLEGAL"])
+            self.assertTrue(all("[model-fallback:" in c.description for c in cases))
+            self.assertTrue(cases[0].to_dict()["geometry_valid"])
+            self.assertFalse(cases[2].to_dict()["geometry_valid"])
+            self.assertEqual(len(list(Path(tmp).glob("fallback_*.json"))), 3)
+            with self.assertRaises(RuntimeError):
+                _generate_cases(**options, llm_debug_dir=None, llm_repair=False)
+        with patch("autodrc.closed_loop.generate_case_with_llm", side_effect=OSError("model unavailable")):
+            with self.assertRaises(RuntimeError):
+                _generate_cases(**options, llm_debug_dir=None, llm_repair=True)
+
     def test_evaluate_intent(self) -> None:
         self.assertTrue(evaluate_intent("GOOD", geometry_valid=True, drc_items=0))
         self.assertFalse(evaluate_intent("GOOD", geometry_valid=True, drc_items=2))
@@ -97,6 +121,30 @@ class ClosedLoopHelpersTests(unittest.TestCase):
         self.assertEqual(bad, 3)
         self.assertEqual(illegal, 1)
         self.assertEqual(actions, ["boost_good_candidates"])
+
+    def test_klayout_bin_defaults_to_system_name(self) -> None:
+        with patch.dict("os.environ", {}, clear=True):
+            self.assertEqual(_klayout_bin(), "klayout")
+
+    def test_klayout_bin_honors_override(self) -> None:
+        with patch.dict("os.environ", {"AUTO_DRC_KLAYOUT_BIN": "/tmp/klayout/bin/klayout"}):
+            self.assertEqual(_klayout_bin(), "/tmp/klayout/bin/klayout")
+
+    def test_run_cmd_injects_extra_ld_library_path(self) -> None:
+        with patch.dict(
+            "os.environ",
+            {
+                "AUTO_DRC_KLAYOUT_LD_LIBRARY_PATH": "/tmp/klayout/lib",
+                "LD_LIBRARY_PATH": "/usr/lib/base",
+            },
+        ):
+            with patch("autodrc.closed_loop.subprocess.run") as run_mock:
+                run_cmd(["klayout", "-b", "-v"])
+        _, kwargs = run_mock.call_args
+        self.assertEqual(
+            kwargs["env"]["LD_LIBRARY_PATH"],
+            "/tmp/klayout/lib:/usr/lib/base",
+        )
 
 
 if __name__ == "__main__":
