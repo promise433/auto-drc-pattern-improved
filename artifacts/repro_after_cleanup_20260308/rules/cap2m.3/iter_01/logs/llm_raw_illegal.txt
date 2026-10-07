@@ -1,8 +1,0 @@
-### Instruction:
-Generate a layout polygon list (LPL) that matches the requested DRC intent.
-
-### Input:
-{"rule_text": "Rule ID: cap2m.3\nDescription: cap2m.3 : min. m4 enclosure of cap2m : 0.14um\nRunset expression: cap2m .and(m4) .enclosing(m4, 0.14, euclidian)\nExpression refs: cap2m, m4\nUpstream chain: L159:m4_wildcard = \"71/20\" | L204:m4 = polygons(m4_wildcard) | L212:cap2m = polygons(97, 44)\nRunset context: if FEOL", "intent": "ILLEGAL", "output_schema": {"intent": "GOOD|BAD|ILLEGAL", "lpl": [{"layer": "m4", "points": [[0, 0], [400, 0], [400, 160], [0, 160], [0, 0]]}]}, "constraints": {"layers_allowed": ["areaid_ag", "areaid_cd", "areaid_ce", "areaid_cr", "areaid_de", "areaid_dn", "areaid_dt", "areaid_ed", "areaid_en", "areaid_en20", "areaid_et", "areaid_fe", "areaid_ft", "areaid_hl", "areaid_ij", "areaid_it", "areaid_ld", "areaid_le", "areaid_lvt", "areaid_mt", "areaid_ns", "areaid_op", "areaid_po", "areaid_rd", "areaid_re", "areaid_sc", "areaid_sd", "areaid_sf", "areaid_sl", "areaid_sr", "areaid_st", "areaid_sw", "areaid_ww", "areaid_zr", "cap2m", "capm", "cfom", "diff", "diff_rs", "dnwell", "hvi", "hvntm", "hvtp", "hvtr", "inductor", "ldntm", "li", "li1", "li_res", "li_rs", "licon", "lvs_prune", "lvtn", "m1", "m2", "m3", "m4", "m5", "mcon", "met1", "met2", "met3", "met4", "met5", "mf", "natfet", "ncm", "npc", "npn", "nsdm", "nsm", "nwell", "pad", "padcenter", "pnp", "poly", "poly_fill", "poly_rs", "psdm", "pwbm", "pwde", "pwell", "pwell_rs", "rdl", "rpm", "tap", "thkox", "tunm", "uhvi", "urpm", "vhvi", "via", "via2", "via3", "via4", "vpp"], "manhattan_only": true, "closed_polygons": true, "return_json_only": true}}
-
-### Response:
-{"intent": "GOOD", "lpl": [{"layer": "m4", "points": [[0, 0], [400, 0], [400, 160], [0, 160], [0, 0]]}]}

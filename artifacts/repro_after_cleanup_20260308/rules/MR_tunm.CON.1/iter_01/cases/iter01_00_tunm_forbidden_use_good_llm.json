@@ -1,8 +1,0 @@
-{
-  "case_id": "tunm_forbidden_use_good_llm",
-  "intent": "GOOD",
-  "description": "llm-generated for: Rule ID: MR_tunm.CON.1\nDescription: MR_tunm.CON.1 : use of layer tunm is prohibited\nRunset expression: tunm\nExpression refs: tunm\nUpstream chain: L180:tunm = polygons(80, 20)\nRunset context: if FEOL [cand=1] [repaired]",
-  "lpl": [],
-  "geometry_valid": true,
-  "validation_errors": []
-}
